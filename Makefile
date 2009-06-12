@@ -1,12 +1,12 @@
-CFLAGS         := $(filter-out -Werror, $(CFLAGS))
-CFLAGS         := $(filter-out -W -Wall, $(CFLAGS))
-
 all: tetris
 
+tetris.o: Makefile tetris.c tetris.h
+
 romfs: all
-	$(ROMFSINST) /bin/tetris
+	@$(ROMFSINST) /bin/tetris
 
 clean:
-	rm tetris
+	-@$(RM) tetris tetris.o
 
 distclean: clean
+

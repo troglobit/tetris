@@ -1,4 +1,24 @@
-/* http://homepages.cwi.nl/~tromp/tetris.html */
+/* An ofbuscated tetris, 1989 IOCCC Best Game
+ * 
+ * Copyright (c) 1989, John Tromp <john.tromp@gmail.com>
+ * Copyright (c) 2009, Joachim Nilsson <joachim.nilsson@vmlinuxorg>
+ * 
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ *
+ * See the following URLs for more information, first John Tromp's page about
+ * the game http://homepages.cwi.nl/~tromp/tetris.html then there's the entry
+ * page at IOCCC http://www.ioccc.org/1989/tromp.hint
+ */
 
 #include <stdio.h>
 #include <unistd.h>
@@ -16,7 +36,7 @@ void alarm_handler (int signal __attribute__ ((unused)))
    setitimer (0, (struct itimerval *)h, 0);
 } 
 
-int c, level, score, s, I, K = 0, j, k, board[B_SIZE], Q[B_SIZE], *n = board, *m;
+int board[B_SIZE], shadow[B_SIZE];
 
 #define      TL     -B_COLS-1       /* top left */
 #define      TC     -B_COLS         /* top center */
@@ -49,61 +69,64 @@ int shapes[] = {
     6,  TC,  BC,  2 * B_COLS,   /* sticks out */
 };
 
-void update ()
+int update (void)
 {
-   int i;
+   int i, I = 0, k;
+   static int K = 0;
 
    for (i = 11; ++i < 264;)
    {
-      if ((k = board[i]) - Q[i])
+      if ((k = board[i]) - shadow[i])
       {
-         Q[i] = k;
-         if (i - ++I || i % 12 < 1) 
-         {
+         shadow[i] = k;
+         if (i - ++I || i % 12 < 1)
             printf ("\033[%d;%dH", (I = i) / 12, i % 12 * 2 + 28);
-         }
          printf ("\033[%dm  " + (K - k ? 0 : 5), k);
          K = k;
       }
    }
-   Q[263] = c = getchar ();
+   shadow[263] = k = getchar ();
+
+   return k;
 }
 
-int fits_in (int b)
+int fits_in (int *shape, int pos)
 {
-   int i;
-
-   for (i = 4; i; i--)
+   if (board[pos] || board[pos + shape[1]] || 
+       board[pos + shape[2]]  || board[pos + shape[3]])
    {
-      if (board[i ? b + n[i] : b])
-         return 0;
+      return 0;
    }
 
    return 1;
 }
 
-void place (int pos, int onoff)
+void place (int *shape, int pos, int b)
 {
-   int i;
-
-   for (i = 4; i; i--)
-   {
-      board[i ? pos + n[i] : pos] = onoff;
-   }
+   board[pos] = b;
+   board[pos + shape[1]] = b;
+   board[pos + shape[2]] = b;
+   board[pos + shape[3]] = b;
 }
 
-int main (int argc, char *argv[])
+int main (int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused)))
 {
-   int i;
-   int pos = 17;                /* start position */
+   int c = 0, i, j, *ptr;
+   int pos = 17;
+   int level, score = 0;
+   int *backup, *shape;
    char *keys = "jkl pq";
    sigset_t set;
    struct sigaction action;
 
    h[3] = 1000000 / (level = 2);
 
+   /* Initialize board */
+   ptr = board;
    for (i = B_SIZE; i; i--)
-      *n++ = i < 25 || i % 12 < 2 ? 7 : 0;
+   {
+      *ptr++ = i < 25 || i % 12 < 2 ? 7 : 0;
+   }
 
    srand (getpid ());
    system ("stty cbreak -echo stop u");
@@ -123,18 +146,18 @@ int main (int argc, char *argv[])
    alarm_handler (0);
 
    puts ("\033[H\033[J");
-   n = shapes + rand () % 7 * 4;
+   shape = &shapes[rand () % 7 * 4];
    while (1)
    {
       if (c < 0)
       {
-         if (fits_in (pos + 12))
+         if (fits_in (shape, pos + 12))
          {
             pos += 12;
          }
          else
          {
-            place (pos, 7);
+            place (shape, pos, 7);
             ++score;
             for (j = 0; j < 252; j = 12 * (j / 12 + 1))
             {
@@ -143,28 +166,39 @@ int main (int argc, char *argv[])
                   if (j % 12 == 10)
                   {
                      for (; j % 12; board[j--] = 0);
-                     update ();
+                     c = update ();
                      for (; --j; board[j + 12] = board[j]);
-                     update ();
+                     c = update ();
                   }
                }
             }
-            n = shapes + rand () % 7 * 4;
-            fits_in (pos = 17) || (c = keys[5]);
+            shape = &shapes[rand () % 7 * 4];
+            if (!fits_in (shape, pos = 17))
+               c = keys[5];
          }
       }
       if (c == keys[0])         /* j - "left" */
-         fits_in (--pos) || ++pos;
-
+      {
+         if (!fits_in (shape, --pos))
+            ++pos;
+      }
       if (c == keys[1])         /* k - "rotate" */
-         n = f + 4 ** (m = n), fits_in (pos) || (n = m);
+      {
+         backup = shape;
+         shape = &shapes[4 * *shape]; /* Rotate */
+         /* Check if it fits, if not restore shape from backup */
+         if (!fits_in (shape, pos))
+            shape = backup;
+      }
 
       if (c == keys[2])         /* l - "right" */
-         fits_in (++pos) || --pos;
-
+      {
+         if (!fits_in (shape, ++pos))
+            --pos;
+      }
       if (c == keys[3])         /* Space - "drop" */
       {
-         for (; fits_in (pos + 12); ++score)
+         for (; fits_in (shape, pos + 12); ++score)
          {
             pos += 12;
          }
@@ -176,7 +210,7 @@ int main (int argc, char *argv[])
          if (c == keys[5])
             break;
 
-         for (j = 264; j--; Q[j] = 0)
+         for (j = 264; j--; shadow[j] = 0)
             ;
 
          while (getchar () - keys[4])
@@ -186,9 +220,9 @@ int main (int argc, char *argv[])
          sigprocmask (SIG_UNBLOCK, &set, NULL);
       }
 
-      place (pos, 7);
-      update ();
-      place (pos, 0);
+      place (shape, pos, 7);
+      c = update ();
+      place (shape, pos, 0);
    }
 
    system ("stty sane");
