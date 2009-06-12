@@ -6,6 +6,8 @@
 #include <stdlib.h>
 #include <signal.h>
 
+#include "tetris.h"
+
 long h[4];
 
 void alarm_handler (int signal __attribute__ ((unused)))
@@ -14,54 +16,95 @@ void alarm_handler (int signal __attribute__ ((unused)))
    setitimer (0, (struct itimerval *)h, 0);
 } 
 
-int c, l, w, s, I, K = 0, i = 276, j, k, q[276], Q[276], *n = q, *m, x = 17, 
-   f[] = {
-   7, -13, -12, 1, 8, -11, -12, -1, 9, -1, 1,
-   12, 3, -13, -12, -1, 12, -1, 11, 1, 15, -1, 13, 1, 18, -1, 1, 2, 0, -12,
-   -1, 11, 1, -12, 1, 13, 10, -12, 1, 12, 11, -12, -1, 1, 2, -12, -1, 12,
-   13, -12, 12, 13, 14, -11, -1, 1, 4, -13, -12, 12, 16, -11, -12, 12, 17,
-   -13, 1, -1, 5, -12, 12, 11, 6, -12, 12, 24
+int c, level, score, s, I, K = 0, j, k, board[B_SIZE], Q[B_SIZE], *n = board, *m;
+
+#define      TL     -B_COLS-1       /* top left */
+#define      TC     -B_COLS         /* top center */
+#define      TR     -B_COLS+1       /* top right */
+#define      ML     -1              /* middle left */
+#define      MR     1               /* middle right */
+#define      BL     B_COLS-1        /* bottom left */
+#define      BC     B_COLS          /* bottom center */
+#define      BR     B_COLS+1        /* bottom right */
+
+int shapes[] = {
+    7,  TL,  TC,  MR, 
+    8,  TR,  TC,  ML, 
+    9,  ML,  MR,  BC, 
+    3,  TL,  TC,  ML,
+   12,  ML,  BL,  MR,
+   15,  ML,  BR,  MR,
+   18,  ML,  MR,   2,           /* sticks out */
+    0,  TC,  ML,  BL,
+    1,  TC,  MR,  BR,
+   10,  TC,  MR,  BC,
+   11,  TC,  ML,  MR,
+    2,  TC,  ML,  BC,
+   13,  TC,  BC,  BR,
+   14,  TR,  ML,  MR, 
+    4,  TL,  TC,  BC,
+   16,  TR,  TC,  BC,
+   17,  TL,  MR,  ML, 
+    5,  TC,  BC,  BL,
+    6,  TC,  BC,  2 * B_COLS,   /* sticks out */
 };
 
-void u ()
+void update ()
 {
+   int i;
+
    for (i = 11; ++i < 264;)
-      if ((k = q[i]) - Q[i])
+   {
+      if ((k = board[i]) - Q[i])
       {
          Q[i] = k;
-         if (i - ++I || i % 12 < 1)
+         if (i - ++I || i % 12 < 1) 
+         {
             printf ("\033[%d;%dH", (I = i) / 12, i % 12 * 2 + 28);
+         }
          printf ("\033[%dm  " + (K - k ? 0 : 5), k);
          K = k;
       }
+   }
    Q[263] = c = getchar ();
 }
 
-int G (int b)
+int fits_in (int b)
 {
-   for (i = 4; i--;)
+   int i;
+
+   for (i = 4; i; i--)
    {
-      if (q[i ? b + n[i] : b])
+      if (board[i ? b + n[i] : b])
          return 0;
    }
 
    return 1;
 }
 
-void g (int b)
+void place (int pos, int onoff)
 {
-   for (i = 4; i--; q[i ? x + n[i] : x] = b);
+   int i;
+
+   for (i = 4; i; i--)
+   {
+      board[i ? pos + n[i] : pos] = onoff;
+   }
 }
 
 int main (int argc, char *argv[])
 {
-   char *a;
+   int i;
+   int pos = 17;                /* start position */
+   char *keys = "jkl pq";
    sigset_t set;
    struct sigaction action;
 
-   h[3] = 1000000 / (l = argc > 1 ? atoi (argv[1]) : 2);
-   for (a = argc > 2 ? argv[2] : "jkl pq"; i; i--)
+   h[3] = 1000000 / (level = 2);
+
+   for (i = B_SIZE; i; i--)
       *n++ = i < 25 || i % 12 < 2 ? 7 : 0;
+
    srand (getpid ());
    system ("stty cbreak -echo stop u");
 
@@ -77,67 +120,75 @@ int main (int argc, char *argv[])
    sigaction(SIGALRM, &action, NULL);
 
    /* Call it once to start the timer. */
-   alarm_handler (14);
+   alarm_handler (0);
 
    puts ("\033[H\033[J");
-   for (n = f + rand () % 7 * 4;; g (7), u (), g (0))
+   n = shapes + rand () % 7 * 4;
+   while (1)
    {
       if (c < 0)
       {
-         if (G (x + 12))
+         if (fits_in (pos + 12))
          {
-            x += 12;
+            pos += 12;
          }
          else
          {
-            g (7);
-            ++w;
+            place (pos, 7);
+            ++score;
             for (j = 0; j < 252; j = 12 * (j / 12 + 1))
             {
-               for (; q[++j];)
+               for (; board[++j];)
                {
                   if (j % 12 == 10)
                   {
-                     for (; j % 12; q[j--] = 0);
-                     u ();
-                     for (; --j; q[j + 12] = q[j]);
-                     u ();
+                     for (; j % 12; board[j--] = 0);
+                     update ();
+                     for (; --j; board[j + 12] = board[j]);
+                     update ();
                   }
                }
             }
-            n = f + rand () % 7 * 4;
-            G (x = 17) || (c = a[5]);
+            n = shapes + rand () % 7 * 4;
+            fits_in (pos = 17) || (c = keys[5]);
          }
       }
-      if (c == *a)
-         G (--x) || ++x;
-      if (c == a[1])
-         n = f + 4 ** (m = n), G (x) || (n = m);
-      if (c == a[2])
-         G (++x) || --x;
-      if (c == a[3])
+      if (c == keys[0])         /* j - "left" */
+         fits_in (--pos) || ++pos;
+
+      if (c == keys[1])         /* k - "rotate" */
+         n = f + 4 ** (m = n), fits_in (pos) || (n = m);
+
+      if (c == keys[2])         /* l - "right" */
+         fits_in (++pos) || --pos;
+
+      if (c == keys[3])         /* Space - "drop" */
       {
-         for (; G (x + 12); ++w)
+         for (; fits_in (pos + 12); ++score)
          {
-            x += 12;
+            pos += 12;
          }
       }
-      if (c == a[4] || c == a[5])
+      if (c == keys[4] || c == keys[5])
       {
          sigprocmask (SIG_BLOCK, &set, NULL);
-         printf ("\033[H\033[J\033[0m%d\n", w);
-         if (c == a[5])
+         printf ("\033[H\033[J\033[0mLevel: %d, Score: %d\n", level, score);
+         if (c == keys[5])
             break;
 
          for (j = 264; j--; Q[j] = 0)
             ;
 
-         while (getchar () - a[4])
+         while (getchar () - keys[4])
             ;
 
          puts ("\033[H\033[J\033[7m");
          sigprocmask (SIG_UNBLOCK, &set, NULL);
       }
+
+      place (pos, 7);
+      update ();
+      place (pos, 0);
    }
 
    system ("stty sane");

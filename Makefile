@@ -3,7 +3,7 @@ CFLAGS         := $(filter-out -W -Wall, $(CFLAGS))
 
 all: tetris
 
-romfs:
+romfs: all
 	$(ROMFSINST) /bin/tetris
 
 clean:
