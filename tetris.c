@@ -4,8 +4,9 @@ t ()
 {
    h[3] -= h[3] / 3000;
    setitimer (0, h, 0);
-} c, d, l, v[] = { (int)t, 0, 2 }, w, s, I, K = 0, i = 276, j, k, q[276],
-   Q[276], *n = q, *m, x = 17, f[] = {
+} c, d, l, v[] = { (int)t, 0, 2 }, w, s, I, K = 0, i = 276, j, k, q[276], 
+   Q[276], *n = q, *m, x = 17, 
+   f[] = {
    7, -13, -12, 1, 8, -11, -12, -1, 9, -1, 1,
    12, 3, -13, -12, -1, 12, -1, 11, 1, 15, -1, 13, 1, 18, -1, 1, 2, 0, -12, -1, 11, 1, -12, 1, 13, 10, -12,
    1, 12, 11, -12, -1, 1, 2, -12, -1, 12, 13, -12, 12, 13, 14, -11, -1, 1, 4, -13, -12, 12, 16, -11, -12,
@@ -85,18 +86,18 @@ char **V, *a;
       if (c == a[4] || c == a[5])
       {
          s = sigblock (8192);
-         printf ("\033[H\033[J\033[0m%d\n", w);
          if (c == a[5])
             break;
+         printf ("\033[H\033[J\033[0m%d\n", w);
          for (j = 264; j--; Q[j] = 0);
          while (getchar () - a[4]);
          puts ("\033[H\033[J\033[7m");
          sigsetmask (s);
       }
    }
-   d = popen ("stty -cbreak echo stop \023;sort -mnr -o HI - HI;cat HI", "w");
-   fprintf (d, "%4d from level %1d by %s\n", w, l, getlogin ());
-   pclose (d);
+   puts ("\033[H\033[J\033[0m");
+   printf ("%d points from level %d by %s\n", w, l, getlogin ());
+   system ("stty sane");
 }
 
 /**
