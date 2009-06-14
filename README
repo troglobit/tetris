@@ -1,32 +1,53 @@
+README
+======
+Welcome to Micro Tetris, based on an original implementation by John Tromp,
+initiated by Freek Wiedijk.  Current maintainer is Joachim Nilsson.
+
+I decided to call this game Micro Tetris because it is very small and only
+utilizes ANSI escape sequences to draw the board. Hence it is very suitable
+for todays small embedded devices.
+
+The game is available from both as a Git source control archive and as
+traditional tarball releases from FTP:
+
+	git clone http://git.vmlinux.org/tetris.git
+	ftp://ftp.vmlinux.org/pub/People/jocke/tetris/
+
+See the file AUTHORS for contact information.
+
+The following game description is from the original IOCCC entry, taken from
+John's home page at http://homepages.cwi.nl/~tromp/tetris.html
+
+                       -- Joachim Nilsson <joachim.nilsson@vmlinux.org>
+
 An ofbuscated tetris, 1989 IOCCC Best Game
 ==========================================
-
 This program plays the familiar game of `TETRIS' with the following features:
 
-    * outputs vt100-like escape-sequences for:
-          o cursor positioning
-          o normal/reverse video 
-      in curses like fashion (minimal output for screen updates)
-    * continuously increasing speed (except in pause)
-    * start speed selectable by giving n as first argument, where n is the
-      number of drops per second (default=2).
-    * controls also selectable by giving as the second argument a string
-      consisting of the following 6 charachters: left, rotate, right,drop, 
-      pause, quit (default="jkl pq")
-    * the screen is blanked during the pause and the score is shown
-    * finally, the program maintains a high-score table. giving a full path
-      name for the table will result in a system-wide hiscore allowing a
-      competition between users. 
+   * outputs vt100-like escape-sequences for:
+      o cursor positioning
+      o normal/reverse video 
+     in curses like fashion (minimal output for screen updates)
+   * continuously increasing speed (except in pause)
+   * start speed selectable by giving n as first argument, where n is the
+     number of drops per second (default=2).
+   * controls also selectable by giving as the second argument a string
+     consisting of the following 6 charachters: left, rotate, right,drop, 
+     pause, quit (default="jkl pq")
+   * the screen is blanked during the pause and the score is shown
+   * finally, the program maintains a high-score table. giving a full path
+     name for the table will result in a system-wide hiscore allowing a
+     competition between users. 
 
 Obfuscation has been achieved by:
 
-    * making effects of signals hard to trace
-    * implicit flushing by getchar()
-    * tricky cursor-parking
-    * minimizing code length
-    * hard coding include-file constants
-    * faking include-file structures
-    * throwing portability out of the window 
+   * making effects of signals hard to trace
+   * implicit flushing by getchar()
+   * tricky cursor-parking
+   * minimizing code length
+   * hard coding include-file constants
+   * faking include-file structures
+   * throwing portability out of the window 
 
 For more on the 1989 IOCCC entry, see http://www.ioccc.org/1989/tromp.hint
 

@@ -1,0 +1,27 @@
+TODO
+====
+
+   * Add Score: and Level: to the display, see suggestion below.
+   * Fix level, so that it actually increases.
+   * Fix speed, so that it increases with each level.
+   * Add basic preview of next piece.
+
+
+   Score: 25345   |                         |
+   Level: 34      |                         |
+                  |                         |
+   Preview:       |                         |
+    __________    |                         |
+   |          |   |                         |
+   |    ||    |   |                         |
+   |  ======  |   |                         |
+   |__________|   |                         |
+                  |                         |
+                  |                         |
+                  |                         |
+                  |                         |
+                  |                         |
+                  |_________________________|
+
+
+
