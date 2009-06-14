@@ -11,7 +11,7 @@ The game is available from both as a Git source control archive and as
 traditional tarball releases from FTP:
 
 	git clone http://git.vmlinux.org/tetris.git
-	ftp://ftp.vmlinux.org/pub/People/jocke/tetris/
+	ftp://ftp.vmlinux.org/pub/People/jocke/micro-tetris/
 
 See the file AUTHORS for contact information.
 
