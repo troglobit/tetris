@@ -20,11 +20,12 @@
  * page at IOCCC http://www.ioccc.org/1989/tromp.hint
  */
 
-#include <stdio.h>
-#include <unistd.h>
-#include <sys/time.h>
-#include <stdlib.h>
 #include <signal.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/time.h>
+#include <sys/wait.h>
+#include <unistd.h>
 
 #include "tetris.h"
 
@@ -129,7 +130,10 @@ int main (int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused
    }
 
    srand (getpid ());
-   system ("stty cbreak -echo stop u");
+   if (WEXITSTATUS(system ("stty cbreak -echo stop u")))
+   {
+      return 1;
+   }
 
    /* Set up signal set with just SIGALRM. */
    sigemptyset(&set);
@@ -225,7 +229,10 @@ int main (int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused
       place (shape, pos, 0);
    }
 
-   system ("stty sane");
+   if (WEXITSTATUS(system ("stty sane")))
+   {
+      return 1;
+   }
 
    return 0;
 }
