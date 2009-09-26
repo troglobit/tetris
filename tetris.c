@@ -25,19 +25,13 @@
 #include <stdlib.h>
 #include <sys/time.h>
 #include <sys/wait.h>
-#include <unistd.h>
+#include <termios.h>
+#include <time.h>
 
 #include "tetris.h"
 
-long h[4];
-
-void alarm_handler (int signal __attribute__ ((unused)))
-{
-   h[3] -= h[3] / 3000;
-   setitimer (0, (struct itimerval *)h, 0);
-} 
-
-int board[B_SIZE], shadow[B_SIZE];
+static struct termios savemodes;
+static int havemodes = 0;
 
 #define      TL     -B_COLS-1       /* top left */
 #define      TC     -B_COLS         /* top center */
@@ -47,6 +41,9 @@ int board[B_SIZE], shadow[B_SIZE];
 #define      BL     B_COLS-1        /* bottom left */
 #define      BC     B_COLS          /* bottom center */
 #define      BR     B_COLS+1        /* bottom right */
+
+int level = 0;
+int board[B_SIZE], shadow[B_SIZE];
 
 int shapes[] = {
     7,  TL,  TC,  MR, 
@@ -70,6 +67,20 @@ int shapes[] = {
     6,  TC,  BC,  2 * B_COLS,   /* sticks out */
 };
 
+void alarm_handler (int signal __attribute__ ((unused)))
+{
+   static long h[4];
+
+   if (!signal)
+   {
+      /* On init from main() */
+      h[3] = 1000000 / (level = 2);
+   }
+
+   h[3] -= h[3] / 3000;
+   setitimer (0, (struct itimerval *)h, 0);
+} 
+
 int update (void)
 {
    int i, I = 0, k;
@@ -81,8 +92,8 @@ int update (void)
       {
          shadow[i] = k;
          if (i - ++I || i % 12 < 1)
-            printf ("\033[%d;%dH", (I = i) / 12, i % 12 * 2 + 28);
-         printf ("\033[%dm  " + (K - k ? 0 : 5), k);
+            printf ("\e[%d;%dH", (I = i) / 12, i % 12 * 2 + 28);
+         printf ("\e[%dm  " + (K - k ? 0 : 5), k);
          K = k;
       }
    }
@@ -110,17 +121,48 @@ void place (int *shape, int pos, int b)
    board[pos + shape[3]] = b;
 }
 
+/* Code stolen from http://c-faq.com/osdep/cbreak.html */
+int tty_break (void)
+{
+   struct termios modmodes;
+
+   if (tcgetattr(fileno(stdin), &savemodes) < 0)
+   {
+      return -1;
+   }
+   havemodes = 1;
+
+   /* "stty cbreak -echo stop p" */
+   modmodes = savemodes;
+   modmodes.c_lflag &= ~ICANON;
+   modmodes.c_lflag &= ~ECHO;
+   modmodes.c_cc[VMIN] = 1;
+   modmodes.c_cc[VTIME] = 0;
+   modmodes.c_cc[VSTOP] = 'p'; /* Pause button */
+
+   return tcsetattr(fileno(stdin), TCSANOW, &modmodes);
+}
+
+int tty_fix (void)
+{
+   if (!havemodes)
+   {
+      return 0;
+   }
+
+   /* "stty sane" */
+   return tcsetattr(fileno(stdin), TCSANOW, &savemodes);
+}
+
 int main (int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused)))
 {
    int c = 0, i, j, *ptr;
    int pos = 17;
-   int level, score = 0;
+   int score = 0;
    int *backup, *shape;
    char *keys = "jkl pq";
    sigset_t set;
    struct sigaction action;
-
-   h[3] = 1000000 / (level = 2);
 
    /* Initialize board */
    ptr = board;
@@ -129,8 +171,8 @@ int main (int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused
       *ptr++ = i < 25 || i % 12 < 2 ? 7 : 0;
    }
 
-   srand (getpid ());
-   if (WEXITSTATUS(system ("stty cbreak -echo stop u")))
+   srand ((unsigned int)time (NULL));
+   if (tty_break () == -1)
    {
       return 1;
    }
@@ -149,7 +191,7 @@ int main (int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused
    /* Call it once to start the timer. */
    alarm_handler (0);
 
-   puts ("\033[H\033[J");
+   puts ("\e[H\e[J");
    shape = &shapes[rand () % 7 * 4];
    while (1)
    {
@@ -210,7 +252,7 @@ int main (int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused
       if (c == keys[4] || c == keys[5])
       {
          sigprocmask (SIG_BLOCK, &set, NULL);
-         printf ("\033[H\033[J\033[0mLevel: %d, Score: %d\n", level, score);
+         printf ("\e[H\e[J\e[0mLevel: %d, Score: %d\n", level, score);
          if (c == keys[5])
             break;
 
@@ -220,7 +262,7 @@ int main (int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused
          while (getchar () - keys[4])
             ;
 
-         puts ("\033[H\033[J\033[7m");
+         puts ("\e[H\e[J\e[7m");
          sigprocmask (SIG_UNBLOCK, &set, NULL);
       }
 
@@ -229,7 +271,7 @@ int main (int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused
       place (shape, pos, 0);
    }
 
-   if (WEXITSTATUS(system ("stty sane")))
+   if (tty_fix () == -1)
    {
       return 1;
    }
