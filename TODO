@@ -1,10 +1,10 @@
 TODO
 ====
 
-   * Add Score: and Level: to the display, see suggestion below.
    * Fix level, so that it actually increases.
    * Fix speed, so that it increases with each level.
    * Add basic preview of next piece.
+   * Fix pause, does not work that well.  Try getting a cup of coffee, for instance.
 
 
    Score: 25345   |                         |

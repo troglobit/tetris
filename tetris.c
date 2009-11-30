@@ -1,12 +1,12 @@
 /* Micro Tetris, based on an obfuscated tetris, 1989 IOCCC Best Game
- * 
+ *
  * Copyright (c) 1989, John Tromp <john.tromp@gmail.com>
  * Copyright (c) 2009, Joachim Nilsson <joachim.nilsson@vmlinux.org>
- * 
+ *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
  * copyright notice and this permission notice appear in all copies.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
@@ -23,11 +23,13 @@
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/time.h>
 #include <sys/wait.h>
 #include <termios.h>
 #include <time.h>
 
+#include "conio.h"
 #include "tetris.h"
 
 static struct termios savemodes;
@@ -42,13 +44,26 @@ static int havemodes = 0;
 #define      BC     B_COLS          /* bottom center */
 #define      BR     B_COLS+1        /* bottom right */
 
-int level = 0;
-int board[B_SIZE], shadow[B_SIZE];
+/* These can be overridden by the user. */
+#define DEFAULT_KEYS "jkl pq"
+#define KEY_LEFT   0
+#define KEY_RIGHT  2
+#define KEY_ROTATE 1
+#define KEY_DROP   3
+#define KEY_PAUSE  4
+#define KEY_QUIT   5
 
+char *keys = DEFAULT_KEYS;
+int level = 1;
+int score = 0;
+int board[B_SIZE];
+
+int *peek_shape;                /* peek preview of next shape */
+int *shape;
 int shapes[] = {
-    7,  TL,  TC,  MR, 
-    8,  TR,  TC,  ML, 
-    9,  ML,  MR,  BC, 
+    7,  TL,  TC,  MR,
+    8,  TR,  TC,  ML,
+    9,  ML,  MR,  BC,
     3,  TL,  TC,  ML,
    12,  ML,  BL,  MR,
    15,  ML,  BR,  MR,
@@ -59,10 +74,10 @@ int shapes[] = {
    11,  TC,  ML,  MR,
     2,  TC,  ML,  BC,
    13,  TC,  BC,  BR,
-   14,  TR,  ML,  MR, 
+   14,  TR,  ML,  MR,
     4,  TL,  TC,  BC,
    16,  TR,  TC,  BC,
-   17,  TL,  MR,  ML, 
+   17,  TL,  MR,  ML,
     5,  TC,  BC,  BL,
     6,  TC,  BC,  2 * B_COLS,   /* sticks out */
 };
@@ -74,37 +89,61 @@ void alarm_handler (int signal __attribute__ ((unused)))
    if (!signal)
    {
       /* On init from main() */
-      h[3] = 1000000 / (level = 2);
+      h[3] = 500000;
    }
 
    h[3] -= h[3] / 3000;
    setitimer (0, (struct itimerval *)h, 0);
-} 
+}
 
 int update (void)
 {
-   int i, I = 0, k;
-   static int K = 0;
+   int x, y;
+   int preview[B_COLS * 10];
 
-   for (i = 11; ++i < 264;)
+   /* Display piece preview. */
+   memset(preview, 0, sizeof(preview));
+   preview[2 * B_COLS + 1] = 7;
+   preview[2 * B_COLS + 1 + peek_shape[1]] = 7;
+   preview[2 * B_COLS + 1 + peek_shape[2]] = 7;
+   preview[2 * B_COLS + 1 + peek_shape[3]] = 7;
+
+   for (y = 0; y < 10; y++)
    {
-      if ((k = board[i]) - shadow[i])
+      for (x = 0; x < B_COLS; x++)
       {
-         shadow[i] = k;
-         if (i - ++I || i % 12 < 1)
-            printf ("\e[%d;%dH", (I = i) / 12, i % 12 * 2 + 28);
-         printf ("\e[%dm  " + (K - k ? 0 : 5), k);
-         K = k;
+         gotoxy(x * 2 + 26 + 28, y + 4);
+         printf ("\e[%dm  ", preview[y * B_COLS + x]);
       }
    }
-   shadow[263] = k = getchar ();
+   textattr(RESETATTR);
+   gotoxy (26 + 28, 4);
+   printf ("Preview:");
 
-   return k;
+   /* Display board. */
+   for (y = 0; y < B_ROWS; y++)
+   {
+      for (x = 0; x < B_COLS; x++)
+      {
+         gotoxy (x * 2 + 28, y);
+         printf ("\e[%dm  ", board[y * B_COLS + x]);
+      }
+   }
+
+   /* Display current level and score */
+   textattr(RESETATTR);
+   gotoxy (26 + 28, 2);
+   printf ("Level  : %d", level);
+   gotoxy (26 + 28, 3);
+   printf ("Score  : %d", score);
+
+
+   return getchar ();
 }
 
 int fits_in (int *shape, int pos)
 {
-   if (board[pos] || board[pos + shape[1]] || 
+   if (board[pos] || board[pos + shape[1]] ||
        board[pos + shape[2]]  || board[pos + shape[3]])
    {
       return 0;
@@ -121,6 +160,19 @@ void place (int *shape, int pos, int b)
    board[pos + shape[3]] = b;
 }
 
+int *next_shape (void)
+{
+   int *next = peek_shape;
+
+   peek_shape = &shapes[rand () % 7 * 4];
+   if (!next)
+   {
+      return next_shape ();
+   }
+
+   return next;
+}
+
 /* Code stolen from http://c-faq.com/osdep/cbreak.html */
 int tty_break (void)
 {
@@ -132,13 +184,15 @@ int tty_break (void)
    }
    havemodes = 1;
 
+   hidecursor();
+
    /* "stty cbreak -echo stop p" */
    modmodes = savemodes;
    modmodes.c_lflag &= ~ICANON;
    modmodes.c_lflag &= ~ECHO;
    modmodes.c_cc[VMIN] = 1;
    modmodes.c_cc[VTIME] = 0;
-   modmodes.c_cc[VSTOP] = 'p'; /* Pause button */
+   modmodes.c_cc[VSTOP] = keys[KEY_PAUSE];
 
    return tcsetattr(fileno(stdin), TCSANOW, &modmodes);
 }
@@ -150,6 +204,8 @@ int tty_fix (void)
       return 0;
    }
 
+   showcursor();
+
    /* "stty sane" */
    return tcsetattr(fileno(stdin), TCSANOW, &savemodes);
 }
@@ -158,9 +214,7 @@ int main (int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused
 {
    int c = 0, i, j, *ptr;
    int pos = 17;
-   int score = 0;
-   int *backup, *shape;
-   char *keys = "jkl pq";
+   int *backup;
    sigset_t set;
    struct sigaction action;
 
@@ -168,7 +222,7 @@ int main (int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused
    ptr = board;
    for (i = B_SIZE; i; i--)
    {
-      *ptr++ = i < 25 || i % 12 < 2 ? 7 : 0;
+      *ptr++ = i < 25 || i % B_COLS < 2 ? 7 : 0;
    }
 
    srand ((unsigned int)time (NULL));
@@ -191,44 +245,44 @@ int main (int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused
    /* Call it once to start the timer. */
    alarm_handler (0);
 
-   puts ("\e[H\e[J");
-   shape = &shapes[rand () % 7 * 4];
+   clrscr ();
+   shape = next_shape ();
    while (1)
    {
       if (c < 0)
       {
-         if (fits_in (shape, pos + 12))
+         if (fits_in (shape, pos + B_COLS))
          {
-            pos += 12;
+            pos += B_COLS;
          }
          else
          {
             place (shape, pos, 7);
             ++score;
-            for (j = 0; j < 252; j = 12 * (j / 12 + 1))
+            for (j = 0; j < 252; j = B_COLS * (j / B_COLS + 1))
             {
                for (; board[++j];)
                {
-                  if (j % 12 == 10)
+                  if (j % B_COLS == 10)
                   {
-                     for (; j % 12; board[j--] = 0);
+                     for (; j % B_COLS; board[j--] = 0);
                      c = update ();
-                     for (; --j; board[j + 12] = board[j]);
+                     for (; --j; board[j + B_COLS] = board[j]);
                      c = update ();
                   }
                }
             }
-            shape = &shapes[rand () % 7 * 4];
+            shape = next_shape ();
             if (!fits_in (shape, pos = 17))
-               c = keys[5];
+               c = keys[KEY_QUIT];
          }
       }
-      if (c == keys[0])         /* j - "left" */
+      if (c == keys[KEY_LEFT])
       {
          if (!fits_in (shape, --pos))
             ++pos;
       }
-      if (c == keys[1])         /* k - "rotate" */
+      if (c == keys[KEY_ROTATE])
       {
          backup = shape;
          shape = &shapes[4 * *shape]; /* Rotate */
@@ -237,32 +291,32 @@ int main (int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused
             shape = backup;
       }
 
-      if (c == keys[2])         /* l - "right" */
+      if (c == keys[KEY_RIGHT])
       {
          if (!fits_in (shape, ++pos))
             --pos;
       }
-      if (c == keys[3])         /* Space - "drop" */
+      if (c == keys[KEY_DROP])
       {
-         for (; fits_in (shape, pos + 12); ++score)
+         for (; fits_in (shape, pos + B_COLS); ++score)
          {
-            pos += 12;
+            pos += B_COLS;
          }
       }
-      if (c == keys[4] || c == keys[5])
+      if (c == keys[KEY_PAUSE] || c == keys[KEY_QUIT])
       {
          sigprocmask (SIG_BLOCK, &set, NULL);
-         printf ("\e[H\e[J\e[0mLevel: %d, Score: %d\n", level, score);
-         if (c == keys[5])
+         clrscr();
+         gotoxy(0,0);
+         textattr(RESETATTR);
+         printf ("Level: %d, Score: %d\n", level, score);
+         if (c == keys[KEY_QUIT])
             break;
 
-         for (j = 264; j--; shadow[j] = 0)
+         while (getchar () - keys[KEY_PAUSE])
             ;
 
-         while (getchar () - keys[4])
-            ;
-
-         puts ("\e[H\e[J\e[7m");
+//         puts ("\e[H\e[J\e[7m");
          sigprocmask (SIG_UNBLOCK, &set, NULL);
       }
 
