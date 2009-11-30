@@ -12,7 +12,7 @@ all: tetris
 tetris.o: Makefile tetris.c tetris.h
 
 clean:
-	-@$(RM) tetris tetris.o
+	-@$(RM) tetris tetris.o *~
 
 distclean: clean
 
