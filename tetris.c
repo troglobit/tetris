@@ -1,7 +1,7 @@
 /* Micro Tetris, based on an obfuscated tetris, 1989 IOCCC Best Game
  *
- * Copyright (c) 1989, John Tromp <john.tromp@gmail.com>
- * Copyright (c) 2009, Joachim Nilsson <joachim.nilsson@vmlinux.org>
+ * Copyright (c) 1989  John Tromp <john.tromp@gmail.com>
+ * Copyright (c) 2009, 2010 Joachim Nilsson <joachim.nilsson@vmlinux.org>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -99,26 +99,25 @@ void alarm_handler (int signal __attribute__ ((unused)))
 int update (void)
 {
    int x, y;
-   int preview[B_COLS * 10];
+#ifdef ENABLE_PREVIEW
+   int preview[10 * 5];
 
    /* Display piece preview. */
-   memset(preview, 0, sizeof(preview));
-   preview[2 * B_COLS + 1] = 7;
-   preview[2 * B_COLS + 1 + peek_shape[1]] = 7;
-   preview[2 * B_COLS + 1 + peek_shape[2]] = 7;
-   preview[2 * B_COLS + 1 + peek_shape[3]] = 7;
+   memset (preview, 0, sizeof(preview));
+   preview[1 * 10 + 1] = 7;
+   preview[1 * 10 + 1 + peek_shape[1]] = 7;
+   preview[1 * 10 + 1 + peek_shape[2]] = 7;
+   preview[1 * 10 + 1 + peek_shape[3]] = 7;
 
-   for (y = 0; y < 10; y++)
+   for (y = 0; y < 5; y++)
    {
-      for (x = 0; x < B_COLS; x++)
+      for (x = 0; x < 10; x++)
       {
-         gotoxy(x * 2 + 26 + 28, y + 4);
-         printf ("\e[%dm  ", preview[y * B_COLS + x]);
+         gotoxy (x * 2 + 26 + 28, y + 5);
+         printf ("\e[%dm  ", preview[y * 10 + x]);
       }
    }
-   textattr(RESETATTR);
-   gotoxy (26 + 28, 4);
-   printf ("Preview:");
+#endif
 
    /* Display board. */
    for (y = 0; y < B_ROWS; y++)
@@ -130,13 +129,16 @@ int update (void)
       }
    }
 
+#ifdef ENABLE_SCORE
    /* Display current level and score */
    textattr(RESETATTR);
    gotoxy (26 + 28, 2);
    printf ("Level  : %d", level);
    gotoxy (26 + 28, 3);
    printf ("Score  : %d", score);
-
+   gotoxy (26 + 28, 4);
+   printf ("Preview:");
+#endif
 
    return getchar ();
 }
