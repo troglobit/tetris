@@ -3,25 +3,7 @@ TODO
 
    * Fix level, so that it actually increases.
    * Fix speed, so that it increases with each level.
-   * Add basic preview of next piece.
    * Fix pause, does not work that well.  Try getting a cup of coffee, for instance.
-
-
-   Score: 25345   |                         |
-   Level: 34      |                         |
-                  |                         |
-   Preview:       |                         |
-    __________    |                         |
-   |          |   |                         |
-   |    ||    |   |                         |
-   |  ======  |   |                         |
-   |__________|   |                         |
-                  |                         |
-                  |                         |
-                  |                         |
-                  |                         |
-                  |                         |
-                  |_________________________|
-
-
+   * Add simple high score saving to file, default /var/games/tetris.scores
+   * Option to disable high score from build, if set points to the save directory.
 
