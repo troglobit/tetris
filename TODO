@@ -5,5 +5,4 @@ TODO
    * Fix level, so that it actually increases.
    * Fix speed, so that it increases with each level.
    * Fix pause, does not work that well.  Try getting a cup of coffee, for instance.
-   * Option to disable high score from build, if set points to the save file.
 

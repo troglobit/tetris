@@ -6,7 +6,7 @@
 # compiler (tcc?) and CFLAGS (-Os -W -Wall -Werror).
 
 VERSION        = 1.1.1-beta1
-CFG_OPTS      ?= -DENABLE_SCORE -DENABLE_PREVIEW
+CFG_OPTS      ?= -DENABLE_SCORE -DENABLE_PREVIEW -DENABLE_HIGH_SCORE
 CPPFLAGS      += $(CFG_OPTS)
 
 all: tetris
