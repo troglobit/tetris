@@ -56,7 +56,7 @@ static int havemodes = 0;
 char *keys = DEFAULT_KEYS;
 int level = 1;
 int score = 0;
-int board[B_SIZE];
+int board[B_SIZE], shadow[B_SIZE];
 
 int *peek_shape;                /* peek preview of next shape */
 int *shape;
@@ -99,33 +99,43 @@ void alarm_handler (int signal __attribute__ ((unused)))
 int update (void)
 {
    int x, y;
+
 #ifdef ENABLE_PREVIEW
-   int preview[10 * 5];
+   int preview[B_COLS * 10];
+   int shadow_preview[B_COLS * 10];
 
    /* Display piece preview. */
    memset (preview, 0, sizeof(preview));
-   preview[1 * 10 + 1] = 7;
-   preview[1 * 10 + 1 + peek_shape[1]] = 7;
-   preview[1 * 10 + 1 + peek_shape[2]] = 7;
-   preview[1 * 10 + 1 + peek_shape[3]] = 7;
+   preview[2 * B_COLS + 1] = 7;
+   preview[2 * B_COLS + 1 + peek_shape[1]] = 7;
+   preview[2 * B_COLS + 1 + peek_shape[2]] = 7;
+   preview[2 * B_COLS + 1 + peek_shape[3]] = 7;
 
-   for (y = 0; y < 5; y++)
+   for (y = 0; y < 10; y++)
    {
-      for (x = 0; x < 10; x++)
+      for (x = 0; x < B_COLS; x++)
       {
-         gotoxy (x * 2 + 26 + 28, y + 5);
-         printf ("\e[%dm  ", preview[y * 10 + x]);
+         if (preview[y * B_COLS + x] - shadow_preview[y * B_COLS + x])
+         {
+            shadow_preview[y * B_COLS + x] = preview[y * B_COLS + x];
+            gotoxy (x * 2 + 26 + 28, y + 4);
+            printf ("\e[%dm  ", preview[y * B_COLS + x]);
+         }
       }
    }
 #endif
 
    /* Display board. */
-   for (y = 0; y < B_ROWS; y++)
+   for (y = 1; y < B_ROWS - 1; y++)
    {
       for (x = 0; x < B_COLS; x++)
       {
-         gotoxy (x * 2 + 28, y);
-         printf ("\e[%dm  ", board[y * B_COLS + x]);
+         if (board[y * B_COLS + x] - shadow[y * B_COLS + x])
+         {
+            shadow[y * B_COLS + x] = board[y * B_COLS + x];
+            gotoxy (x * 2 + 28, y);
+            printf ("\e[%dm  ", board[y * B_COLS + x]);
+         }
       }
    }
 
@@ -314,6 +324,9 @@ int main (int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused
          printf ("Level: %d, Score: %d\n", level, score);
          if (c == keys[KEY_QUIT])
             break;
+
+         for (j = B_SIZE; j--; shadow[j] = 0)
+            ;
 
          while (getchar () - keys[KEY_PAUSE])
             ;
