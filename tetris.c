@@ -28,6 +28,7 @@
 #include <sys/wait.h>
 #include <termios.h>
 #include <time.h>
+#include <unistd.h>
 
 #include "conio.h"
 #include "tetris.h"
@@ -52,6 +53,9 @@ static int havemodes = 0;
 #define KEY_DROP   3
 #define KEY_PAUSE  4
 #define KEY_QUIT   5
+
+#define HIGH_SCORE_FILE "/var/games/tetris.scores"
+#define TEMP_SCORE_FILE "/tmp/tetris-tmp.scores"
 
 char *keys = DEFAULT_KEYS;
 int level = 1;
@@ -317,11 +321,33 @@ int main (int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused
       }
       if (c == keys[KEY_PAUSE] || c == keys[KEY_QUIT])
       {
+         FILE *tmpscore;
+
          sigprocmask (SIG_BLOCK, &set, NULL);
          clrscr();
          gotoxy(0,0);
          textattr(RESETATTR);
-         printf ("Level: %d, Score: %d\n", level, score);
+
+         if ((tmpscore = fopen (HIGH_SCORE_FILE, "a")))
+         {
+            char *name = getenv("LOGNAME");
+
+            if (!name)
+               name = "anonymous";
+
+            fprintf (tmpscore, "%7d\t %5d\t  %3d\t%s\n", score * level, score, level, name);
+            fclose (tmpscore);
+
+            system ("cat " HIGH_SCORE_FILE "| sort -rn | head -10 >" TEMP_SCORE_FILE
+                    "&& cp " TEMP_SCORE_FILE " " HIGH_SCORE_FILE);
+            remove (TEMP_SCORE_FILE);
+         }
+
+         printf ("Your score: %d points x level %d = %d\n\n", score, level, score * level);
+//         puts ("\nHit RETURN to see high scores, ^C to skip.");
+         fprintf (stderr, "  Score\tPoints\tLevel\tName\n");
+         system ("cat " HIGH_SCORE_FILE);
+         fflush (stdout);
          if (c == keys[KEY_QUIT])
             break;
 
