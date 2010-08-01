@@ -235,13 +235,12 @@ int tty_break (void)
 
    hidecursor();
 
-   /* "stty cbreak -echo stop p" */
+   /* "stty cbreak -echo" */
    modmodes = savemodes;
    modmodes.c_lflag &= ~ICANON;
    modmodes.c_lflag &= ~ECHO;
    modmodes.c_cc[VMIN] = 1;
    modmodes.c_cc[VTIME] = 0;
-   modmodes.c_cc[VSTOP] = keys[KEY_PAUSE];
 
    return tcsetattr(fileno(stdin), TCSANOW, &modmodes);
 }
@@ -357,15 +356,17 @@ int main (int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused
       if (c == keys[KEY_PAUSE] || c == keys[KEY_QUIT])
       {
          sigprocmask (SIG_BLOCK, &set, NULL);
-         clrscr();
-         gotoxy(0,0);
-         textattr(RESETATTR);
-
-         printf ("Your score: %d points x level %d = %d\n\n", points, level, points * level);
-         show_high_score ();
 
          if (c == keys[KEY_QUIT])
+         {
+            clrscr();
+            gotoxy(0,0);
+            textattr(RESETATTR);
+
+            printf ("Your score: %d points x level %d = %d\n\n", points, level, points * level);
+            show_high_score ();
             break;
+         }
 
          for (j = B_SIZE; j--; shadow[j] = 0)
             ;
