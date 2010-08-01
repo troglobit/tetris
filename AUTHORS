@@ -1,9 +1,11 @@
 Initiator:
-         Freek Wiedijk <freek@cs.ru.nl>
+	Freek Wiedijk <freek@cs.ru.nl>
 
 Original Author:
-         John Tromp <john.tromp@gmail.com>
+	John Tromp <john.tromp@gmail.com>
 
 Current maintainer:
-        Joachim Nilsson <joachim.nilsson@vmlinux.org>
+	Joachim Nilsson <joachim.nilsson@vmlinux.org>
 
+Contributors:
+	Mattias Walstrom <lazzer@vmlinux.org>

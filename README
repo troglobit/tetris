@@ -1,7 +1,7 @@
 README                                          -*-text-*-
 
 Welcome to Micro Tetris, based on an original implementation by John Tromp,
-initiated by Freek Wiedijk.  Current maintainer is Joachim Nilsson.
+initiated by Freek Wiedijk.  Currently maintained by Joachim Nilsson.
 
 I decided to call this game Micro Tetris because it is very small and only
 utilizes ANSI escape sequences to draw the board. Hence it is very suitable
@@ -15,13 +15,26 @@ traditional tarball releases from FTP:
 
 See the file AUTHORS for contact information.
 
+                       -- Joachim Nilsson <joachim.nilsson@vmlinux.org>
+
+Keyboard Control
+----------------
+
+    j         - Left
+    k         - Rotate
+    l         - Right
+    <SPACE>   - Drop
+    p         - Pause
+    q         - Quit
+
+
+Background
+----------
 The following game description is from the original IOCCC entry, taken from
 John's home page at http://homepages.cwi.nl/~tromp/tetris.html
 
-                       -- Joachim Nilsson <joachim.nilsson@vmlinux.org>
-
 An ofbuscated tetris, 1989 IOCCC Best Game
-==========================================
+
 This program plays the familiar game of `TETRIS' with the following features:
 
    * outputs vt100-like escape-sequences for:
