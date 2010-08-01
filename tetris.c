@@ -97,7 +97,7 @@ void alarm_handler (int signal __attribute__ ((unused)))
       h[3] = 500000;
    }
 
-   h[3] -= h[3] / 3000;
+   h[3] -= h[3] / (3000 - 10 * level);
    setitimer (0, (struct itimerval *)h, 0);
 }
 
