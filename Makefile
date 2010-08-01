@@ -7,6 +7,7 @@
 
 VERSION        = 1.1.1-beta1
 CFG_OPTS      ?= -DENABLE_SCORE -DENABLE_PREVIEW -DENABLE_HIGH_SCORE
+CC            ?= @gcc
 CPPFLAGS      += $(CFG_OPTS)
 
 all: tetris
@@ -19,7 +20,9 @@ clean:
 distclean: clean
 
 install: all
-	install tetris $(DESTDIR)
+	@install -D -m 0755 tetris $(DESTDIR)/bin/tetris
+	@touch /tmp/tetris.scores
+	@install -D -m 0664 -g games /tmp/tetris.scores $(DESTDIR)/var/games/tetris.scores
 
 dist:
 	@git archive --format=tar --prefix=tetris-$(VERSION)/ $(VERSION) | bzip2 >../tetris-$(VERSION).tar.bz2
