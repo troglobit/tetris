@@ -104,8 +104,8 @@ void alarm_handler (int signal __attribute__ ((unused)))
 int update (void)
 {
    int x, y;
-
 #ifdef ENABLE_PREVIEW
+   const int start = 5;
    int preview[B_COLS * 10];
    int shadow_preview[B_COLS * 10];
 
@@ -116,14 +116,14 @@ int update (void)
    preview[2 * B_COLS + 1 + peek_shape[2]] = 7;
    preview[2 * B_COLS + 1 + peek_shape[3]] = 7;
 
-   for (y = 0; y < 10; y++)
+   for (y = 0; y < 4; y++)
    {
       for (x = 0; x < B_COLS; x++)
       {
          if (preview[y * B_COLS + x] - shadow_preview[y * B_COLS + x])
          {
             shadow_preview[y * B_COLS + x] = preview[y * B_COLS + x];
-            gotoxy (x * 2 + 26 + 28, y + 4);
+            gotoxy (x * 2 + 26 + 28, start + y);
             printf ("\e[%dm  ", preview[y * B_COLS + x]);
          }
       }
@@ -158,9 +158,13 @@ int update (void)
    printf ("Level  : %d", level);
    gotoxy (26 + 28, 3);
    printf ("Points : %d", points);
-   gotoxy (26 + 28, 4);
+#endif
+#ifdef ENABLE_PREVIEW
+   gotoxy (26 + 28, 5);
    printf ("Preview:");
 #endif
+   gotoxy (26 + 28, 10);
+   printf ("Keys:");
 
    return getchar ();
 }
@@ -220,6 +224,25 @@ void show_high_score (void)
    fprintf (stderr, "  Score\tPoints\tLevel\tName\n");
    system ("cat " HIGH_SCORE_FILE);
 #endif /* ENABLE_HIGH_SCORE */
+}
+
+void show_online_help (void)
+{
+   const int start = 11;
+
+   textattr(RESETATTR);
+   gotoxy (26 + 28, start);
+   puts("j     - left");
+   gotoxy (26 + 28, start + 1);
+   puts("k     - rotate");
+   gotoxy (26 + 28, start + 2);
+   puts("l     - right");
+   gotoxy (26 + 28, start + 3);
+   puts("space - drop");
+   gotoxy (26 + 28, start + 4);
+   puts("p     - pause");
+   gotoxy (26 + 28, start + 5);
+   puts("q     - quit");
 }
 
 /* Code stolen from http://c-faq.com/osdep/cbreak.html */
@@ -294,6 +317,8 @@ int main (int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused
    alarm_handler (0);
 
    clrscr ();
+   show_online_help ();
+
    shape = next_shape ();
    while (1)
    {
