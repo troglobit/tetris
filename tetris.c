@@ -59,7 +59,8 @@ static int havemodes = 0;
 
 char *keys = DEFAULT_KEYS;
 int level = 1;
-int score = 0;
+int points = 0;
+int lines_cleared = 0;
 int board[B_SIZE], shadow[B_SIZE];
 
 int *peek_shape;                /* peek preview of next shape */
@@ -143,13 +144,20 @@ int update (void)
       }
    }
 
+   /* Update points and level*/
+   while (lines_cleared >= 10)
+   {
+      lines_cleared -= 10;
+      level++;
+   }
+
 #ifdef ENABLE_SCORE
-   /* Display current level and score */
+   /* Display current level and points */
    textattr(RESETATTR);
    gotoxy (26 + 28, 2);
    printf ("Level  : %d", level);
    gotoxy (26 + 28, 3);
-   printf ("Score  : %d", score);
+   printf ("Points : %d", points);
    gotoxy (26 + 28, 4);
    printf ("Preview:");
 #endif
@@ -201,7 +209,7 @@ void show_high_score (void)
       if (!name)
          name = "anonymous";
 
-      fprintf (tmpscore, "%7d\t %5d\t  %3d\t%s\n", score * level, score, level, name);
+      fprintf (tmpscore, "%7d\t %5d\t  %3d\t%s\n", points * level, points, level, name);
       fclose (tmpscore);
 
       system ("cat " HIGH_SCORE_FILE "| sort -rn | head -10 >" TEMP_SCORE_FILE
@@ -299,13 +307,15 @@ int main (int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused
          else
          {
             place (shape, pos, 7);
-            ++score;
+            ++points;
             for (j = 0; j < 252; j = B_COLS * (j / B_COLS + 1))
             {
                for (; board[++j];)
                {
                   if (j % B_COLS == 10)
                   {
+                     lines_cleared++;
+
                      for (; j % B_COLS; board[j--] = 0);
                      c = update ();
                      for (; --j; board[j + B_COLS] = board[j]);
@@ -339,7 +349,7 @@ int main (int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused
       }
       if (c == keys[KEY_DROP])
       {
-         for (; fits_in (shape, pos + B_COLS); ++score)
+         for (; fits_in (shape, pos + B_COLS); ++points)
          {
             pos += B_COLS;
          }
@@ -351,7 +361,7 @@ int main (int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused
          gotoxy(0,0);
          textattr(RESETATTR);
 
-         printf ("Your score: %d points x level %d = %d\n\n", score, level, score * level);
+         printf ("Your score: %d points x level %d = %d\n\n", points, level, points * level);
          show_high_score ();
 
          if (c == keys[KEY_QUIT])
