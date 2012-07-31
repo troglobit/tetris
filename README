@@ -7,15 +7,13 @@ I decided to call this game Micro Tetris because it is very small and only
 utilizes ANSI escape sequences to draw the board. Hence it is very suitable
 for todays small embedded devices.
 
-The game is available from both as a Git source control archive and as
-traditional tarball releases from FTP:
+The game is available from as a Git source control archive from GitHub:
 
-	git clone http://git.vmlinux.org/tetris.git
-	ftp://ftp.vmlinux.org/pub/People/jocke/micro-tetris/
+	http://github.com/troglobit/tetris
 
 See the file AUTHORS for contact information.
 
-                       -- Joachim Nilsson <joachim.nilsson@vmlinux.org>
+                       -- Joachim Nilsson <troglobit@gmail.com>
 
 Keyboard Control
 ----------------

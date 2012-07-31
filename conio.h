@@ -1,6 +1,6 @@
 /* A conio.h like implementation for VTANSI displays.
  *
- * Copyright (c) 2009  Joachim Nilsson <joachim.nilsson@member.fsf.org>
+ * Copyright (c) 2009  Joachim Nilsson <troglobit@gmail.com>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above

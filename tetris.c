@@ -1,7 +1,7 @@
 /* Micro Tetris, based on an obfuscated tetris, 1989 IOCCC Best Game
  *
  * Copyright (c) 1989  John Tromp <john.tromp@gmail.com>
- * Copyright (c) 2009, 2010 Joachim Nilsson <joachim.nilsson@vmlinux.org>
+ * Copyright (c) 2009, 2010 Joachim Nilsson <troglobit@gmail.com>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
