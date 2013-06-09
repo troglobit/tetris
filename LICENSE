@@ -15,11 +15,13 @@ WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
 ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
+-----------------------------------------------------------------------------
+
 See the following URLs for more information, first John Tromp's page about
 the game http://homepages.cwi.nl/~tromp/tetris.html then there's the entry
 page at IOCCC http://www.ioccc.org/1989/tromp.hint
 
-See the Git repository, http://git.vmlinux.org/tetris.git, for details on
+See the Git repository, https://github.com/troglobit/tetris, for details on
 the historical ancestry.
 
 The email conversation with John about the license, slightly paraphrased.
