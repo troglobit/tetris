@@ -13,7 +13,7 @@ Issue tracker and GIT repository available at GitHub:
 
 * [Repository]
 * [Issue Tracker]
-* [tetris-1.2.1.tar.bz2][1], [MD5][2]
+* [tetris-1.2.1.tar.bz2][1] [MD5][2]
 
 
 Origin & References
