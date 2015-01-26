@@ -13,7 +13,7 @@ Issue tracker and GIT repository available at GitHub:
 
 * [Repository]
 * [Issue Tracker]
-* [tetris-1.2.1.tar.bz2][1] [MD5][2]
+* [tetris-1.2.1.tar.bz2][tarball], [MD5][hashfile]
 
 
 Origin & References
@@ -25,12 +25,12 @@ home page for the source code http://tromp.github.io/tetris.html
 
 This human-readable "clone" is maintained by [Joachim Nilsson].
 
-[1]: ftp://troglobit.com/tetris/tetris-1.2.1.tar.bz2
-[2]: ftp://troglobit.com/tetris/tetris-1.2.1.tar.bz2.md5
-[uClibc]: http://uclibc.org
-[musl libc]: http://musl-libc.org
-[Repository]: http://github.com/troglobit/tetris
-[Issue Tracker]: http://github.com/troglobit/tetris/issues
-[John Tromp]: http://tromp.github.io/
+[uClibc]:          http://uclibc.org
+[musl libc]:       http://musl-libc.org
+[John Tromp]:      http://tromp.github.io/
+[Repository]:      http://github.com/troglobit/tetris
+[Issue Tracker]:   http://github.com/troglobit/tetris/issues
 [Joachim Nilsson]: http://troglobit.com
+[tarball]:         http://troglobit.com/tetris/tetris-1.2.1.tar.bz2
+[hashfile]:        http://troglobit.com/tetris/tetris-1.2.1.tar.bz2.md5
 
