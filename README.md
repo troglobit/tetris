@@ -17,7 +17,7 @@ Issue tracker and GIT repository available at GitHub:
 
 
 Origin & References
---------------------
+-------------------
 
 The game is based on a 1989 *International Obfuscated C Code Contest*
 ([IOCCC](http://www.ioccc.org)) entry made by [John Tromp].  See John's
