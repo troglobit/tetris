@@ -16,6 +16,23 @@ Issue tracker and GIT repository available at GitHub:
 * [tetris-1.2.1.tar.bz2][tarball], [MD5][hashfile]
 
 
+Docker Image
+------------
+
+The [GIT repository][repository] has a `Dockerfile` for building a
+Docker image.  Simply check out the GIT sources and:
+
+```shell
+cd tetris/
+docker build -t troglobit:tetris .
+.
+.
+.
+docker run -ti troglobit:tetris
+```
+
+These instructions assume you already have [docker.io][] installed.
+
 Origin & References
 -------------------
 
@@ -27,6 +44,7 @@ This human-readable "clone" is maintained by [Joachim Nilsson].
 
 [uClibc]:          http://uclibc.org
 [musl libc]:       http://musl-libc.org
+[docker.io]:       https://www.docker.com
 [John Tromp]:      http://tromp.github.io/
 [Repository]:      http://github.com/troglobit/tetris
 [Issue Tracker]:   http://github.com/troglobit/tetris/issues
