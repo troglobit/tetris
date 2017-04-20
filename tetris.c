@@ -253,6 +253,16 @@ int tty_fix(void)
 	return tcsetattr(fileno(stdin), TCSANOW, &savemodes);
 }
 
+void freeze(int enable)
+{
+	sigset_t set;
+
+	sigemptyset(&set);
+	sigaddset(&set, SIGALRM);
+
+	sigprocmask(enable ? SIG_BLOCK : SIG_UNBLOCK, &set, NULL);
+}
+
 void alarm_handler(int signo)
 {
 	static long h[4];
@@ -289,7 +299,6 @@ int main(int argc, char *argv[])
 	int c = 0, i, j, *ptr;
 	int pos = 17;
 	int *backup;
-	sigset_t set;
 
 	/* Initialize board */
 	ptr = board;
@@ -299,10 +308,6 @@ int main(int argc, char *argv[])
 	srand((unsigned int)time(NULL));
 	if (tty_break() == -1)
 		return 1;
-
-	/* Set up signal set with just SIGALRM. */
-	sigemptyset(&set);
-	sigaddset(&set, SIGALRM);
 
 	/* Set up signals */
 	sig_init();
@@ -363,7 +368,7 @@ int main(int argc, char *argv[])
 		}
 
 		if (c == keys[KEY_PAUSE] || c == keys[KEY_QUIT]) {
-			sigprocmask(SIG_BLOCK, &set, NULL);
+			freeze(1);
 
 			if (c == keys[KEY_QUIT]) {
 				clrscr();
@@ -382,7 +387,7 @@ int main(int argc, char *argv[])
 			   ;
 
 //			puts("\e[H\e[J\e[7m");
-			sigprocmask(SIG_UNBLOCK, &set, NULL);
+			freeze(0);
 		}
 
 		place(shape, pos, 7);
