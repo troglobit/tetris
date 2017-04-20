@@ -146,6 +146,7 @@ int update(void)
 #endif
 	gotoxy(26 + 28, 10);
 	printf("Keys:");
+	fflush(stdout);
 
 	return getchar();
 }
