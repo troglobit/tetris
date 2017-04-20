@@ -88,18 +88,6 @@ int shapes[] = {
 	 6, TC, BC,  2 * B_COLS, /* sticks out */
 };
 
-void alarm_handler(int signal __attribute__ ((unused)))
-{
-	static long h[4];
-
-	/* On init from main() */
-	if (!signal)
-		h[3] = 500000;
-
-	h[3] -= h[3] / (3000 - 10 * level);
-	setitimer(0, (struct itimerval *)h, 0);
-}
-
 int update(void)
 {
 	int x, y;
@@ -266,12 +254,42 @@ int tty_fix(void)
 }
 
 int main(int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused)))
+void alarm_handler(int signo)
+{
+	static long h[4];
+
+	/* On init from main() */
+	if (!signo)
+		h[3] = 500000;
+
+	h[3] -= h[3] / (3000 - 10 * level);
+	setitimer(0, (struct itimerval *)h, 0);
+}
+
+void exit_handler(int signo)
+{
+	clrscr();
+	tty_fix();
+	exit(0);
+}
+
+int sig_init(void)
+{
+	struct sigaction sa;
+
+	SIGNAL(SIGINT, exit_handler);
+	SIGNAL(SIGTERM, exit_handler);
+	SIGNAL(SIGALRM, alarm_handler);
+
+	/* Start update timer. */
+	alarm_handler(0);
+}
+
 {
 	int c = 0, i, j, *ptr;
 	int pos = 17;
 	int *backup;
 	sigset_t set;
-	struct sigaction action;
 
 	/* Initialize board */
 	ptr = board;
@@ -286,15 +304,8 @@ int main(int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused)
 	sigemptyset(&set);
 	sigaddset(&set, SIGALRM);
 
-	/* Trap SIGALRM. */
-	sigemptyset(&action.sa_mask);
-	sigaddset(&action.sa_mask, SIGALRM);
-	action.sa_flags = 0;
-	action.sa_handler = alarm_handler;
-	sigaction(SIGALRM, &action, NULL);
-
-	/* Call it once to start the timer. */
-	alarm_handler(0);
+	/* Set up signals */
+	sig_init();
 
 	clrscr();
 	show_online_help();

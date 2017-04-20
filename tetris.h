@@ -16,6 +16,13 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+#define SIGNAL(signo, cb)			\
+	sigemptyset(&sa.sa_mask);		\
+	sigaddset(&sa.sa_mask, signo);		\
+	sa.sa_flags = 0;			\
+	sa.sa_handler = cb;			\
+	sigaction(signo, &sa, NULL);
+
 /* the board */
 #define      B_COLS 12
 #define      B_ROWS 23
