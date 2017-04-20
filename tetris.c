@@ -223,7 +223,7 @@ void show_online_help(void)
 }
 
 /* Code stolen from http://c-faq.com/osdep/cbreak.html */
-int tty_break(void)
+int tty_init(void)
 {
 	struct termios modmodes;
 
@@ -243,7 +243,7 @@ int tty_break(void)
 	return tcsetattr(fileno(stdin), TCSANOW, &modmodes);
 }
 
-int tty_fix(void)
+int tty_exit(void)
 {
 	if (!havemodes)
 		return 0;
@@ -279,7 +279,7 @@ void alarm_handler(int signo)
 void exit_handler(int signo)
 {
 	clrscr();
-	tty_fix();
+	tty_exit();
 	exit(0);
 }
 
@@ -307,7 +307,7 @@ int main(int argc, char *argv[])
 		*ptr++ = i < 25 || i % B_COLS < 2 ? 7 : 0;
 
 	srand((unsigned int)time(NULL));
-	if (tty_break() == -1)
+	if (tty_init() == -1)
 		return 1;
 
 	/* Set up signals */
@@ -396,7 +396,7 @@ int main(int argc, char *argv[])
 		place(shape, pos, 0);
 	}
 
-	if (tty_fix() == -1)
+	if (tty_exit() == -1)
 		return 1;
 
 	return 0;
