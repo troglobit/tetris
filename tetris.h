@@ -1,7 +1,7 @@
 /* Micro Tetris, based on an obfuscated tetris, 1989 IOCCC Best Game
  *
- * Copyright (c) 1989, John Tromp <john.tromp@gmail.com>
- * Copyright (c) 2009, Joachim Nilsson <troglobit@gmail.com>
+ * Copyright (c) 1989  John Tromp <john.tromp@gmail.com>
+ * Copyright (c) 2009, 2010, 2017  Joachim Nilsson <troglobit@gmail.com>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -16,19 +16,8 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#ifndef __TETRIS_H__
-#define __TETRIS_H__
-
-        /* the board */
+/* the board */
 #define      B_COLS 12
 #define      B_ROWS 23
 #define      B_SIZE (B_ROWS * B_COLS)
 
-#endif  /* __TETRIS_H__ */
-
-/**
- * Local Variables:
- *  version-control: t
- *  c-file-style: "ellemtel"
- * End:
- */

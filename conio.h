@@ -1,6 +1,6 @@
 /* A conio.h like implementation for VTANSI displays.
  *
- * Copyright (c) 2009  Joachim Nilsson <troglobit@gmail.com>
+ * Copyright (c) 2009, 2010, 2017  Joachim Nilsson <troglobit@gmail.com>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -15,9 +15,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#ifndef __CONIO_H__
-#define __CONIO_H__
-
 #include <stdio.h>
 
 /* Attributes */
@@ -25,7 +22,7 @@
 #define BRIGHT       1
 #define DIM          2
 #define UNDERSCORE   4
-#define BLINK        5           /* May not work on all displays. */
+#define BLINK        5
 #define REVERSE      7
 #define HIDDEN       8
 
@@ -71,11 +68,9 @@
 #define textcolor(color)      __set_gm(RESETATTR, color, 30)
 #define textbackground(color) __set_gm(RESETATTR, color, 40)
 
-#endif /* __CONIO_H__ */
-
 /**
  * Local Variables:
- *  version-control: t
- *  c-file-style: "ellemtel"
+ *  indent-tabs-mode: t
+ *  c-file-style: "linux"
  * End:
  */
