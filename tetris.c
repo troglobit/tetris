@@ -253,7 +253,6 @@ int tty_fix(void)
 	return tcsetattr(fileno(stdin), TCSANOW, &savemodes);
 }
 
-int main(int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused)))
 void alarm_handler(int signo)
 {
 	static long h[4];
@@ -285,6 +284,7 @@ int sig_init(void)
 	alarm_handler(0);
 }
 
+int main(int argc, char *argv[])
 {
 	int c = 0, i, j, *ptr;
 	int pos = 17;
