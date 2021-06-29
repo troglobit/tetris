@@ -15,14 +15,18 @@ all: tetris
 tetris.o: Makefile tetris.c tetris.h
 
 clean:
-	-@$(RM) tetris tetris.o *~
+	-@$(RM) tetris tetris.o
 
 distclean: clean
+	-@$(RM) *.o *~
 
 install: all
 	@install -D -m 0755 tetris $(DESTDIR)/bin/tetris
 	@touch /tmp/tetris.scores
 	@install -D -m 0664 /tmp/tetris.scores $(DESTDIR)/var/games/tetris.scores
+
+uninstall:
+	-@$(RM) $(DESTDIR)/bin/tetris
 
 dist:
 	@git archive --format=tar --prefix=tetris-$(VERSION)/ $(VERSION) | bzip2 >../tetris-$(VERSION).tar.bz2
