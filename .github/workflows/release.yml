@@ -21,7 +21,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          args:
-            - ../*.tar.bz2
-            - ../*.md5
-            - ../*.sha256
+          args: '../*.tar.bz2 ../*.md5 ../*.sha256'
