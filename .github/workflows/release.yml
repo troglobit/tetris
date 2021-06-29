@@ -15,10 +15,13 @@ jobs:
       - name: Check build ...
         run: make
       - name: Build release ...
-        run: make release
+        run: |
+          make release
+          mkdir -p artifacts/
+          cp ../*.tar.* ../*.md5 ../*.sha* artifacts/
       - name: Upload artifacts ...
         uses: skx/github-action-publish-binaries@release-0.15
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          args: '../*.tar.bz2 ../*.md5 ../*.sha256'
+          args: artifacts/*
