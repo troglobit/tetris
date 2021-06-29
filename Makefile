@@ -30,4 +30,5 @@ uninstall:
 
 dist:
 	@git archive --format=tar --prefix=tetris-$(VERSION)/ $(VERSION) | bzip2 >../tetris-$(VERSION).tar.bz2
-
+	@(cd .. && md5sum    tetris-$(VERSION).tar.bz2 > tetris-$(VERSION).tar.bz2.md5)
+	@(cd .. && sha256sum tetris-$(VERSION).tar.bz2 > tetris-$(VERSION).tar.bz2.sha256)
