@@ -32,3 +32,12 @@ dist:
 	@git archive --format=tar --prefix=tetris-$(VERSION)/ $(VERSION) | bzip2 >../tetris-$(VERSION).tar.bz2
 	@(cd .. && md5sum    tetris-$(VERSION).tar.bz2 > tetris-$(VERSION).tar.bz2.md5)
 	@(cd .. && sha256sum tetris-$(VERSION).tar.bz2 > tetris-$(VERSION).tar.bz2.sha256)
+
+release: dist
+	@echo "Resulting release files in parent dir:"
+	@echo "=================================================================================================="
+	@for file in tetris-$(VERSION).tar.bz2; do					\
+                printf "%-33s Distribution tarball\n" $$file;                           \
+                printf "%-33s " $$file.md5;    cat ../$$file.md5    | cut -f1 -d' ';    \
+                printf "%-33s " $$file.sha256; cat ../$$file.sha256 | cut -f1 -d' ';    \
+	done
