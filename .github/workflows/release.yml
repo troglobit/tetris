@@ -1,6 +1,9 @@
 name: Release General
 
 on:
+  push:
+    tags:
+      - '*'
   release:
     types:
       - created
