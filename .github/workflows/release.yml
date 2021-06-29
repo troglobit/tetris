@@ -33,7 +33,6 @@ jobs:
           draft: false
           prerelease: false
       - name: Upload artifacts ...
-        needs: [create_release]
         uses: skx/github-action-publish-binaries@release-0.15
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
