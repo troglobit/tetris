@@ -5,22 +5,25 @@ Micro Tetris™
 
 Micro Tetris™ — one of the smallest Tetris implementations in the world!
 Utilizing only ANSI escape sequences to draw the board, no external
-library dependencies other than a standard C library, like [uClibc] or
-[musl libc]. Hence, very suitable for embedded devices in need of an
+library dependencies other than a standard C library, like [uClibc][] or
+[musl libc][]. Hence, very suitable for embedded devices in need of an
 easter egg ;-)
 
 Issue tracker and GIT repository available at GitHub:
 
-* [Repository]
-* [Issue Tracker]
-* [tetris-1.2.1.tar.bz2][tarball], [MD5][hashfile]
+  * [Repository][]
+  * [Issue Tracker][]
+  * [Docker Image](https://ghcr.io/troglobit/tetris)
+  * [tetris-1.3.0.tar.bz2][tarball], [MD5][], [SHA256][]
 
 
 Docker Image
 ------------
 
-The [GIT repository][repository] has a `Dockerfile` for building a
-Docker image.  Simply check out the GIT sources and:
+Pre-built Docker images are available from <https://ghcr.io/> as of the
+v1.3.0 release.  Previous releases available on <https://hub.dockercom>.
+The [GIT repository][repository] has a `Dockerfile` for building your
+own image from the source tree:
 
 ```shell
 cd tetris/
@@ -31,16 +34,17 @@ docker build -t troglobit:tetris .
 docker run -ti troglobit:tetris
 ```
 
-These instructions assume you already have [docker.io][] installed.
+> These instructions assume you already have [docker.io][] installed.
+
 
 Origin & References
 -------------------
 
 The game is based on a 1989 *International Obfuscated C Code Contest*
-([IOCCC](http://www.ioccc.org)) entry made by [John Tromp].  See John's
-home page for the source code http://tromp.github.io/tetris.html
+([IOCCC](http://www.ioccc.org)) entry made by [John Tromp][].  See
+John's home page for the source code http://tromp.github.io/tetris.html
 
-This human-readable "clone" is maintained by [Joachim Wiberg].
+This human-readable "clone" is maintained by [Joachim Wiberg][].
 
 [uClibc]:          http://uclibc.org
 [musl libc]:       http://musl-libc.org
@@ -48,7 +52,7 @@ This human-readable "clone" is maintained by [Joachim Wiberg].
 [John Tromp]:      http://tromp.github.io/
 [Repository]:      http://github.com/troglobit/tetris
 [Issue Tracker]:   http://github.com/troglobit/tetris/issues
-[Joachim Wiberg]: http://troglobit.com
-[tarball]:         http://troglobit.com/tetris/tetris-1.2.1.tar.bz2
-[hashfile]:        http://troglobit.com/tetris/tetris-1.2.1.tar.bz2.md5
-
+[Joachim Wiberg]:  http://troglobit.com
+[tarball]:         http://troglobit.com/tetris/tetris-1.3.0.tar.bz2
+[MD5]:             http://troglobit.com/tetris/tetris-1.3.0.tar.bz2.md5
+[SHA256]:          http://troglobit.com/tetris/tetris-1.3.0.tar.bz2.sha256
