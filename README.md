@@ -1,7 +1,7 @@
 Micro Tetris™
 =============
 
-![ASCII Image of Micro Tetris](micro-tetris.png "Play Micro Tetris!")
+<img align="right" src="micro-tetris.png" alt="ASCII Image of Micro Tetris">
 
 Micro Tetris™ — one of the smallest Tetris implementations in the world!
 Utilizing only ANSI escape sequences to draw the board, no external
