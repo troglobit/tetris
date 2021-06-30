@@ -5,7 +5,7 @@
 # Set CC and CFGLAGS in your local environment for a suitable
 # compiler (tcc?) and CFLAGS (-Os -W -Wall -Werror).
 
-VERSION        = 1.3.0-beta8
+VERSION        = 1.3.0
 CFG_OPTS      ?= -DENABLE_SCORE -DENABLE_PREVIEW -DENABLE_HIGH_SCORE
 CC            ?= @gcc
 CPPFLAGS      += $(CFG_OPTS)
