@@ -20,10 +20,10 @@ Issue tracker and GIT repository available at GitHub:
 Docker Image
 ------------
 
-Pre-built Docker images are available from <https://ghcr.io/> as of the
-v1.3.0 release.  Previous releases available on <https://hub.dockercom>.
-The [GIT repository][repository] has a `Dockerfile` for building your
-own image from the source tree:
+Pre-built Docker images are available from [ghcr.io][] as of the v1.3.0
+release.  Previous releases available on <https://hub.dockercom>.  The
+[GIT repository][repository] has a `Dockerfile` for building your own
+image from the source tree:
 
 ```shell
 cd tetris/
@@ -47,6 +47,7 @@ John's home page for the source code http://tromp.github.io/tetris.html
 This human-readable "clone" is maintained by [Joachim Wiberg][].
 
 [uClibc]:          https://uclibc-ng.org
+[ghcr.io]:         https://github.com/troglobit/tetris/pkgs/container/tetris/
 [musl libc]:       https://www.musl-libc.org
 [docker.io]:       https://www.docker.com
 [John Tromp]:      https://tromp.github.io/
