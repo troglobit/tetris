@@ -1,7 +1,7 @@
+<img align="right" src="micro-tetris.png" alt="ASCII Image of Micro Tetris">
+
 Micro Tetris™
 =============
-
-<img align="right" src="micro-tetris.png" alt="ASCII Image of Micro Tetris">
 
 Micro Tetris™ — one of the smallest Tetris implementations in the world!
 Utilizing only ANSI escape sequences to draw the board, no external
@@ -46,13 +46,13 @@ John's home page for the source code http://tromp.github.io/tetris.html
 
 This human-readable "clone" is maintained by [Joachim Wiberg][].
 
-[uClibc]:          http://uclibc.org
-[musl libc]:       http://musl-libc.org
+[uClibc]:          https://uclibc-ng.org
+[musl libc]:       https://www.musl-libc.org
 [docker.io]:       https://www.docker.com
-[John Tromp]:      http://tromp.github.io/
-[Repository]:      http://github.com/troglobit/tetris
-[Issue Tracker]:   http://github.com/troglobit/tetris/issues
-[Joachim Wiberg]:  http://troglobit.com
-[tarball]:         http://troglobit.com/tetris/tetris-1.3.0.tar.bz2
-[MD5]:             http://troglobit.com/tetris/tetris-1.3.0.tar.bz2.md5
-[SHA256]:          http://troglobit.com/tetris/tetris-1.3.0.tar.bz2.sha256
+[John Tromp]:      https://tromp.github.io/
+[Repository]:      https://github.com/troglobit/tetris
+[Issue Tracker]:   https://github.com/troglobit/tetris/issues
+[Joachim Wiberg]:  https://troglobit.com
+[tarball]:         https://troglobit.com/tetris/tetris-1.3.0.tar.bz2
+[MD5]:             https://troglobit.com/tetris/tetris-1.3.0.tar.bz2.md5
+[SHA256]:          https://troglobit.com/tetris/tetris-1.3.0.tar.bz2.sha256
