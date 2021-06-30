@@ -13,15 +13,6 @@ jobs:
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/')
     steps:
-      - name: Checkout tree ...
-        uses: actions/checkout@v2
-      - name: Check build ...
-        run: make
-      - name: Build release ...
-        run: |
-          make release
-          mkdir -p artifacts/
-          cp ../*.tar.* ../*.md5 ../*.sha* artifacts/
       - name: Create release ...
         id: create_release
         uses: actions/create-release@v1
@@ -32,7 +23,16 @@ jobs:
           release_name: Micro Tetris v${{ github.ref }}
           draft: false
           prerelease: false
-      - name: Upload artifacts ...
+      - name: Checkout tree ...
+        uses: actions/checkout@v2
+      - name: Check build ...
+        run: make
+      - name: Build release ...
+        run: |
+          make release
+          mkdir -p artifacts/
+          cp ../*.tar.* ../*.md5 ../*.sha* artifacts/
+      - name: Upload release artifacts ...
         uses: skx/github-action-publish-binaries@release-0.15
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
