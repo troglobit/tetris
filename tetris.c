@@ -116,12 +116,10 @@ int update(void)
 	int x, y;
 
 #ifdef ENABLE_PREVIEW
+	static int shadow_preview[B_COLS * 10] = { 0 };
+	int preview[B_COLS * 10] = { 0 };
 	const int start = 5;
-	int preview[B_COLS * 10];
-	int shadow_preview[B_COLS * 10];
 
-	/* Display piece preview. */
-	memset(preview, 0, sizeof(preview));
 	preview[2 * B_COLS + 1] = pcolor;
 	preview[2 * B_COLS + 1 + peek_shape[1]] = pcolor;
 	preview[2 * B_COLS + 1 + peek_shape[2]] = pcolor;
@@ -130,7 +128,7 @@ int update(void)
 	for (y = 0; y < 4; y++) {
 		for (x = 0; x < B_COLS; x++) {
 			if (preview[y * B_COLS + x] - shadow_preview[y * B_COLS + x]) {
-				int color = preview[y * B_COLS + x];;
+				int color = preview[y * B_COLS + x];
 
 				shadow_preview[y * B_COLS + x] = color;
 				draw(x * 2 + 26 + 28, start + y, color);
