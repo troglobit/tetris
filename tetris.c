@@ -30,11 +30,22 @@
 #include <time.h>
 #include <unistd.h>
 
-#include "conio.h"
-#include "tetris.h"
+#define clrscr()       puts ("\e[2J\e[1;1H")
+#define gotoxy(x,y)    printf("\e[%d;%dH", y, x)
+#define hidecursor()   puts ("\e[?25l")
+#define showcursor()   puts ("\e[?25h")
 
-static struct termios savemodes;
-static int havemodes = 0;
+#define SIGNAL(signo, cb)			\
+	sigemptyset(&sa.sa_mask);		\
+	sigaddset(&sa.sa_mask, signo);		\
+	sa.sa_flags = 0;			\
+	sa.sa_handler = cb;			\
+	sigaction(signo, &sa, NULL);
+
+/* the board */
+#define      B_COLS 12
+#define      B_ROWS 23
+#define      B_SIZE (B_ROWS * B_COLS)
 
 #define TL     -B_COLS-1	/* top left */
 #define TC     -B_COLS		/* top center */
@@ -56,6 +67,9 @@ static int havemodes = 0;
 
 #define HIGH_SCORE_FILE "/var/games/tetris.scores"
 #define TEMP_SCORE_FILE "/tmp/tetris-tmp.scores"
+
+static struct termios savemodes;
+static int havemodes = 0;
 
 char *keys = DEFAULT_KEYS;
 int level = 1;
@@ -134,9 +148,8 @@ int update(void)
 
 #ifdef ENABLE_SCORE
 	/* Display current level and points */
-	textattr(RESETATTR);
 	gotoxy(26 + 28, 2);
-	printf("Level  : %d", level);
+	printf("\e[0mLevel  : %d", level);
 	gotoxy(26 + 28, 3);
 	printf("Points : %d", points);
 #endif
@@ -207,9 +220,8 @@ void show_online_help(void)
 {
 	const int start = 11;
 
-	textattr(RESETATTR);
 	gotoxy(26 + 28, start);
-	puts("j     - left");
+	puts("\e[0mj     - left");
 	gotoxy(26 + 28, start + 1);
 	puts("k     - rotate");
 	gotoxy(26 + 28, start + 2);
@@ -374,9 +386,8 @@ int main(int argc, char *argv[])
 			if (c == keys[KEY_QUIT]) {
 				clrscr();
 				gotoxy(0, 0);
-				textattr(RESETATTR);
 
-				printf("Your score: %d points x level %d = %d\n\n", points, level, points * level);
+				printf("\e[0mYour score: %d points x level %d = %d\n\n", points, level, points * level);
 				show_high_score();
 				break;
 			}

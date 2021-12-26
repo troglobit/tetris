@@ -12,7 +12,7 @@ CPPFLAGS      += $(CFG_OPTS)
 
 all: tetris
 
-tetris.o: Makefile tetris.c tetris.h
+tetris.o: Makefile tetris.c
 
 clean:
 	-@$(RM) tetris tetris.o
