@@ -1,4 +1,4 @@
-<img align="right" src="micro-tetris.png" alt="ASCII Image of Micro Tetris">
+<img align="right" src="micro-tetris-color.png" alt="Micro Tetris in Action">
 
 Micro Tetris™
 =============
