@@ -224,9 +224,11 @@ void show_high_score(void)
 		remove(TEMP_SCORE_FILE);
 	}
 
-//	puts("\nHit RETURN to see high scores, ^C to skip.");
-	fprintf(stderr, "  Score\tPoints\tLevel\tName\n");
-	system("cat " HIGH_SCORE_FILE);
+	if (!access(HIGH_SCORE_FILE, R_OK)) {
+//		puts("\nHit RETURN to see high scores, ^C to skip.");
+		fprintf(stderr, "  Score\tPoints\tLevel\tName\n");
+		system("cat " HIGH_SCORE_FILE);
+	}
 #endif /* ENABLE_HIGH_SCORE */
 }
 
