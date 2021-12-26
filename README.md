@@ -14,13 +14,13 @@ Issue tracker and GIT repository available at GitHub:
   * [Repository][]
   * [Issue Tracker][]
   * [Docker Image](https://ghcr.io/troglobit/tetris)
-  * [tetris-1.3.0.tar.bz2][tarball], [MD5][], [SHA256][]
+  * [tetris-1.4.0.tar.gz][tarball], [MD5][], [SHA256][]
 
 
 Docker Image
 ------------
 
-Pre-built Docker images are available from [ghcr.io][] as of the v1.3.0
+Pre-built Docker images are available from [ghcr.io][] as of the v1.4.0
 release.  Previous releases available on <https://hub.dockercom>.  The
 [GIT repository][repository] has a `Dockerfile` for building your own
 image from the source tree:
@@ -54,6 +54,6 @@ This human-readable "clone" is maintained by [Joachim Wiberg][].
 [Repository]:      https://github.com/troglobit/tetris
 [Issue Tracker]:   https://github.com/troglobit/tetris/issues
 [Joachim Wiberg]:  https://troglobit.com
-[tarball]:         https://ftp.troglobit.com/tetris/tetris-1.3.0.tar.bz2
-[MD5]:             https://ftp.troglobit.com/tetris/tetris-1.3.0.tar.bz2.md5
-[SHA256]:          https://ftp.troglobit.com/tetris/tetris-1.3.0.tar.bz2.sha256
+[tarball]:         https://ftp.troglobit.com/tetris/tetris-1.4.0.tar.gz
+[MD5]:             https://ftp.troglobit.com/tetris/tetris-1.4.0.tar.gz.md5
+[SHA256]:          https://ftp.troglobit.com/tetris/tetris-1.4.0.tar.gz.sha256
