@@ -29,14 +29,14 @@ uninstall:
 	-@$(RM) $(DESTDIR)/bin/tetris
 
 dist:
-	@git archive --format=tar --prefix=tetris-$(VERSION)/ $(VERSION) | bzip2 >../tetris-$(VERSION).tar.bz2
-	@(cd .. && md5sum    tetris-$(VERSION).tar.bz2 > tetris-$(VERSION).tar.bz2.md5)
-	@(cd .. && sha256sum tetris-$(VERSION).tar.bz2 > tetris-$(VERSION).tar.bz2.sha256)
+	@git archive --format=tar --prefix=tetris-$(VERSION)/ $(VERSION) | gzip >../tetris-$(VERSION).tar.gz
+	@(cd .. && md5sum    tetris-$(VERSION).tar.gz > tetris-$(VERSION).tar.gz.md5)
+	@(cd .. && sha256sum tetris-$(VERSION).tar.gz > tetris-$(VERSION).tar.gz.sha256)
 
 release: dist
 	@echo "Resulting release files in parent dir:"
 	@echo "=================================================================================================="
-	@for file in tetris-$(VERSION).tar.bz2; do					\
+	@for file in tetris-$(VERSION).tar.gz; do					\
                 printf "%-33s Distribution tarball\n" $$file;                           \
                 printf "%-33s " $$file.md5;    cat ../$$file.md5    | cut -f1 -d' ';    \
                 printf "%-33s " $$file.sha256; cat ../$$file.sha256 | cut -f1 -d' ';    \
