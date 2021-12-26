@@ -34,6 +34,7 @@
 #define gotoxy(x,y)    printf("\e[%d;%dH", y, x)
 #define hidecursor()   puts ("\e[?25l")
 #define showcursor()   puts ("\e[?25h")
+#define bgcolor(c,s)   printf("\e[%dm" s, c ? c + 40 : 0);
 
 #define SIGNAL(signo, cb)			\
 	sigemptyset(&sa.sa_mask);		\
@@ -78,29 +79,37 @@ int lines_cleared = 0;
 int board[B_SIZE], shadow[B_SIZE];
 
 int *peek_shape;		/* peek preview of next shape */
+int  pcolor;
 int *shape;
+int  color;
 
 int shapes[] = {
-	 7, TL, TC, MR,
-	 8, TR, TC, ML,
-	 9, ML, MR, BC,
-	 3, TL, TC, ML,
-	12, ML, BL, MR,
-	15, ML, BR, MR,
-	18, ML, MR,  2,		/* sticks out */
-	 0, TC, ML, BL,
-	 1, TC, MR, BR,
-	10, TC, MR, BC,
-	11, TC, ML, MR,
-	 2, TC, ML, BC,
-	13, TC, BC, BR,
-	14, TR, ML, MR,
-	 4, TL, TC, BC,
-	16, TR, TC, BC,
-	17, TL, MR, ML,
-	 5, TC, BC, BL,
-	 6, TC, BC,  2 * B_COLS, /* sticks out */
+	 7, TL, TC, MR, 2,	/* ""__   */
+	 8, TR, TC, ML, 3,	/* __""   */
+	 9, ML, MR, BC, 1,	/* "|"    */
+	 3, TL, TC, ML, 4,	/* square */
+	12, ML, BL, MR, 5,	/* |"""   */
+	15, ML, BR, MR, 6,	/* """|   */
+	18, ML, MR,  2, 7,	/* ---- sticks out */
+	 0, TC, ML, BL, 2,	/* /    */
+	 1, TC, MR, BR, 3,	/* \    */
+	10, TC, MR, BC, 1,	/* |-   */
+	11, TC, ML, MR, 1,	/* _|_  */
+	 2, TC, ML, BC, 1,	/* -|   */
+	13, TC, BC, BR, 5,	/* |_   */
+	14, TR, ML, MR, 5,	/* ___| */
+	 4, TL, TC, BC, 5,	/* "|   */
+	16, TR, TC, BC, 6,	/* |"   */
+	17, TL, MR, ML, 6,	/* |___ */
+	 5, TC, BC, BL, 6,	/* _| */
+	 6, TC, BC,  2 * B_COLS, 7, /* | sticks out */
 };
+
+void draw(int x, int y, int color)
+{
+	gotoxy(x, y);
+	bgcolor(color, "  ");
+}
 
 int update(void)
 {
@@ -113,17 +122,18 @@ int update(void)
 
 	/* Display piece preview. */
 	memset(preview, 0, sizeof(preview));
-	preview[2 * B_COLS + 1] = 7;
-	preview[2 * B_COLS + 1 + peek_shape[1]] = 7;
-	preview[2 * B_COLS + 1 + peek_shape[2]] = 7;
-	preview[2 * B_COLS + 1 + peek_shape[3]] = 7;
+	preview[2 * B_COLS + 1] = pcolor;
+	preview[2 * B_COLS + 1 + peek_shape[1]] = pcolor;
+	preview[2 * B_COLS + 1 + peek_shape[2]] = pcolor;
+	preview[2 * B_COLS + 1 + peek_shape[3]] = pcolor;
 
 	for (y = 0; y < 4; y++) {
 		for (x = 0; x < B_COLS; x++) {
 			if (preview[y * B_COLS + x] - shadow_preview[y * B_COLS + x]) {
-				shadow_preview[y * B_COLS + x] = preview[y * B_COLS + x];
-				gotoxy(x * 2 + 26 + 28, start + y);
-				printf("\e[%dm  ", preview[y * B_COLS + x]);
+				int color = preview[y * B_COLS + x];;
+
+				shadow_preview[y * B_COLS + x] = color;
+				draw(x * 2 + 26 + 28, start + y, color);
 			}
 		}
 	}
@@ -133,9 +143,10 @@ int update(void)
 	for (y = 1; y < B_ROWS - 1; y++) {
 		for (x = 0; x < B_COLS; x++) {
 			if (board[y * B_COLS + x] - shadow[y * B_COLS + x]) {
-				shadow[y * B_COLS + x] = board[y * B_COLS + x];
-				gotoxy(x * 2 + 28, y);
-				printf("\e[%dm  ", board[y * B_COLS + x]);
+				int color = board[y * B_COLS + x];
+
+				shadow[y * B_COLS + x] = color;
+				draw(x * 2 + 28, y, color);
 			}
 		}
 	}
@@ -172,21 +183,24 @@ int fits_in(int *shape, int pos)
 	return 1;
 }
 
-void place(int *shape, int pos, int b)
+void place(int *shape, int pos, int color)
 {
-	board[pos] = b;
-	board[pos + shape[1]] = b;
-	board[pos + shape[2]] = b;
-	board[pos + shape[3]] = b;
+	board[pos] = color;
+	board[pos + shape[1]] = color;
+	board[pos + shape[2]] = color;
+	board[pos + shape[3]] = color;
 }
 
 int *next_shape(void)
 {
+	int  pos  = rand() % 7 * 5;
 	int *next = peek_shape;
 
-	peek_shape = &shapes[rand() % 7 * 4];
+	peek_shape = &shapes[pos];
+	pcolor = peek_shape[4];
 	if (!next)
 		return next_shape();
+	color = next[4];
 
 	return next;
 }
@@ -334,7 +348,7 @@ int main(int argc, char *argv[])
 			if (fits_in(shape, pos + B_COLS)) {
 				pos += B_COLS;
 			} else {
-				place(shape, pos, 7);
+				place(shape, pos, color);
 				++points;
 				for (j = 0; j < 252; j = B_COLS * (j / B_COLS + 1)) {
 					for (; board[++j];) {
@@ -364,7 +378,7 @@ int main(int argc, char *argv[])
 
 		if (c == keys[KEY_ROTATE]) {
 			backup = shape;
-			shape = &shapes[4 * *shape];	/* Rotate */
+			shape = &shapes[5 * *shape];	/* Rotate */
 			/* Check if it fits, if not restore shape from backup */
 			if (!fits_in(shape, pos))
 				shape = backup;
@@ -402,7 +416,7 @@ int main(int argc, char *argv[])
 			freeze(0);
 		}
 
-		place(shape, pos, 7);
+		place(shape, pos, color);
 		c = update();
 		place(shape, pos, 0);
 	}
