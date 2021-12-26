@@ -327,10 +327,10 @@ int main(int argc, char *argv[])
 	int pos = 17;
 	int *backup;
 
-	/* Initialize board */
+	/* Initialize board, grey border, used to be white(7) */
 	ptr = board;
 	for (i = B_SIZE; i; i--)
-		*ptr++ = i < 25 || i % B_COLS < 2 ? 7 : 0;
+		*ptr++ = i < 25 || i % B_COLS < 2 ? 60 : 0;
 
 	srand((unsigned int)time(NULL));
 	if (tty_init() == -1)
