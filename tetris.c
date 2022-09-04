@@ -321,7 +321,7 @@ int sig_init(void)
 	alarm_handler(0);
 }
 
-int main(int argc, char *argv[])
+int main(void)
 {
 	int c = 0, i, j, *ptr;
 	int pos = 17;
