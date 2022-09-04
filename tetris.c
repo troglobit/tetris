@@ -34,14 +34,14 @@
 #define gotoxy(x,y)    printf("\033[%d;%dH", y, x)
 #define hidecursor()   puts ("\033[?25l")
 #define showcursor()   puts ("\033[?25h")
-#define bgcolor(c,s)   printf("\033[%dm" s, c ? c + 40 : 0);
+#define bgcolor(c,s)   printf("\033[%dm" s, c ? c + 40 : 0)
 
 #define SIGNAL(signo, cb)			\
 	sigemptyset(&sa.sa_mask);		\
 	sigaddset(&sa.sa_mask, signo);		\
 	sa.sa_flags = 0;			\
 	sa.sa_handler = cb;			\
-	sigaction(signo, &sa, NULL);
+	sigaction(signo, &sa, NULL)
 
 /* the board */
 #define      B_COLS 12
