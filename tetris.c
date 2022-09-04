@@ -30,11 +30,11 @@
 #include <time.h>
 #include <unistd.h>
 
-#define clrscr()       puts ("\e[2J\e[1;1H")
-#define gotoxy(x,y)    printf("\e[%d;%dH", y, x)
-#define hidecursor()   puts ("\e[?25l")
-#define showcursor()   puts ("\e[?25h")
-#define bgcolor(c,s)   printf("\e[%dm" s, c ? c + 40 : 0);
+#define clrscr()       puts ("\033[2J\033[1;1H")
+#define gotoxy(x,y)    printf("\033[%d;%dH", y, x)
+#define hidecursor()   puts ("\033[?25l")
+#define showcursor()   puts ("\033[?25h")
+#define bgcolor(c,s)   printf("\033[%dm" s, c ? c + 40 : 0);
 
 #define SIGNAL(signo, cb)			\
 	sigemptyset(&sa.sa_mask);		\
@@ -158,7 +158,7 @@ static int update(void)
 #ifdef ENABLE_SCORE
 	/* Display current level and points */
 	gotoxy(26 + 28, 2);
-	printf("\e[0mLevel  : %d", level);
+	printf("\033[0mLevel  : %d", level);
 	gotoxy(26 + 28, 3);
 	printf("Points : %d", points);
 #endif
@@ -235,7 +235,7 @@ static void show_online_help(void)
 	const int start = 11;
 
 	gotoxy(26 + 28, start);
-	puts("\e[0mj     - left");
+	puts("\033[0mj     - left");
 	gotoxy(26 + 28, start + 1);
 	puts("k     - rotate");
 	gotoxy(26 + 28, start + 2);
@@ -405,7 +405,7 @@ int main(void)
 				clrscr();
 				gotoxy(0, 0);
 
-				printf("\e[0mYour score: %d points x level %d = %d\n\n", points, level, points * level);
+				printf("\033[0mYour score: %d points x level %d = %d\n\n", points, level, points * level);
 				show_high_score();
 				break;
 			}
@@ -416,7 +416,7 @@ int main(void)
 			while (getchar() - keys[KEY_PAUSE])
 			   ;
 
-//			puts("\e[H\e[J\e[7m");
+//			puts("\033[H\033[J\033[7m");
 			freeze(0);
 		}
 
