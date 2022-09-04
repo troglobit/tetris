@@ -294,6 +294,8 @@ void alarm_handler(int signo)
 {
 	static long h[4];
 
+	(void)signo;
+
 	/* On init from main() */
 	if (!signo)
 		h[3] = 500000;
@@ -304,6 +306,8 @@ void alarm_handler(int signo)
 
 void exit_handler(int signo)
 {
+	(void)signo;
+
 	clrscr();
 	tty_exit();
 	exit(0);
