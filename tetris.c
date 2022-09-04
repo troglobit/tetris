@@ -69,6 +69,8 @@
 #define HIGH_SCORE_FILE "/var/games/tetris.scores"
 #define TEMP_SCORE_FILE "/tmp/tetris-tmp.scores"
 
+static volatile sig_atomic_t running = 1;
+
 static struct termios savemodes;
 static int havemodes = 0;
 
@@ -309,10 +311,7 @@ static void alarm_handler(int signo)
 static void exit_handler(int signo)
 {
 	(void)signo;
-
-	clrscr();
-	tty_exit();
-	exit(0);
+	running = 0;
 }
 
 static void sig_init(void)
@@ -349,7 +348,7 @@ int main(void)
 	show_online_help();
 
 	shape = next_shape();
-	while (1) {
+	while (running) {
 		if (c < 0) {
 			if (fits_in(shape, pos + B_COLS)) {
 				pos += B_COLS;
@@ -427,6 +426,7 @@ int main(void)
 		place(shape, pos, 0);
 	}
 
+	clrscr();
 	if (tty_exit() == -1)
 		return 1;
 
