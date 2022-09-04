@@ -72,18 +72,18 @@
 static struct termios savemodes;
 static int havemodes = 0;
 
-char *keys = DEFAULT_KEYS;
-int level = 1;
-int points = 0;
-int lines_cleared = 0;
-int board[B_SIZE], shadow[B_SIZE];
+static char *keys = DEFAULT_KEYS;
+static int level = 1;
+static int points = 0;
+static int lines_cleared = 0;
+static int board[B_SIZE], shadow[B_SIZE];
 
-int *peek_shape;		/* peek preview of next shape */
-int  pcolor;
-int *shape;
-int  color;
+static int *peek_shape;		/* peek preview of next shape */
+static int  pcolor;
+static int *shape;
+static int  color;
 
-int shapes[] = {
+static int shapes[] = {
 	 7, TL, TC, MR, 2,	/* ""__   */
 	 8, TR, TC, ML, 3,	/* __""   */
 	 9, ML, MR, BC, 1,	/* "|"    */
@@ -105,13 +105,13 @@ int shapes[] = {
 	 6, TC, BC,  2 * B_COLS, 7, /* | sticks out */
 };
 
-void draw(int x, int y, int color)
+static void draw(int x, int y, int color)
 {
 	gotoxy(x, y);
 	bgcolor(color, "  ");
 }
 
-int update(void)
+static int update(void)
 {
 	int x, y;
 
@@ -181,7 +181,7 @@ int fits_in(int *shape, int pos)
 	return 1;
 }
 
-void place(int *shape, int pos, int color)
+static void place(int *shape, int pos, int color)
 {
 	board[pos] = color;
 	board[pos + shape[1]] = color;
@@ -189,7 +189,7 @@ void place(int *shape, int pos, int color)
 	board[pos + shape[3]] = color;
 }
 
-int *next_shape(void)
+static int *next_shape(void)
 {
 	int  pos  = rand() % 7 * 5;
 	int *next = peek_shape;
@@ -203,7 +203,7 @@ int *next_shape(void)
 	return next;
 }
 
-void show_high_score(void)
+static void show_high_score(void)
 {
 #ifdef ENABLE_HIGH_SCORE
 	FILE *tmpscore;
@@ -230,7 +230,7 @@ void show_high_score(void)
 #endif /* ENABLE_HIGH_SCORE */
 }
 
-void show_online_help(void)
+static void show_online_help(void)
 {
 	const int start = 11;
 
@@ -249,7 +249,7 @@ void show_online_help(void)
 }
 
 /* Code stolen from http://c-faq.com/osdep/cbreak.html */
-int tty_init(void)
+static int tty_init(void)
 {
 	struct termios modmodes;
 
@@ -269,7 +269,7 @@ int tty_init(void)
 	return tcsetattr(fileno(stdin), TCSANOW, &modmodes);
 }
 
-int tty_exit(void)
+static int tty_exit(void)
 {
 	if (!havemodes)
 		return 0;
@@ -280,7 +280,7 @@ int tty_exit(void)
 	return tcsetattr(fileno(stdin), TCSANOW, &savemodes);
 }
 
-void freeze(int enable)
+static void freeze(int enable)
 {
 	sigset_t set;
 
@@ -290,7 +290,7 @@ void freeze(int enable)
 	sigprocmask(enable ? SIG_BLOCK : SIG_UNBLOCK, &set, NULL);
 }
 
-void alarm_handler(int signo)
+static void alarm_handler(int signo)
 {
 	static long h[4];
 
@@ -304,7 +304,7 @@ void alarm_handler(int signo)
 	setitimer(0, (struct itimerval *)h, 0);
 }
 
-void exit_handler(int signo)
+static void exit_handler(int signo)
 {
 	(void)signo;
 
@@ -313,7 +313,7 @@ void exit_handler(int signo)
 	exit(0);
 }
 
-int sig_init(void)
+static int sig_init(void)
 {
 	struct sigaction sa;
 
