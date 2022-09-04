@@ -105,10 +105,10 @@ static int shapes[] = {
 	 6, TC, BC,  2 * B_COLS, 7, /* | sticks out */
 };
 
-static void draw(int x, int y, int color)
+static void draw(int x, int y, int c)
 {
 	gotoxy(x, y);
-	bgcolor(color, "  ");
+	bgcolor(c, "  ");
 }
 
 static int update(void)
@@ -128,10 +128,10 @@ static int update(void)
 	for (y = 0; y < 4; y++) {
 		for (x = 0; x < B_COLS; x++) {
 			if (preview[y * B_COLS + x] - shadow_preview[y * B_COLS + x]) {
-				int color = preview[y * B_COLS + x];
+				int c = preview[y * B_COLS + x]; /* color */
 
-				shadow_preview[y * B_COLS + x] = color;
-				draw(x * 2 + 26 + 28, start + y, color);
+				shadow_preview[y * B_COLS + x] = c;
+				draw(x * 2 + 26 + 28, start + y, c);
 			}
 		}
 	}
@@ -141,10 +141,10 @@ static int update(void)
 	for (y = 1; y < B_ROWS - 1; y++) {
 		for (x = 0; x < B_COLS; x++) {
 			if (board[y * B_COLS + x] - shadow[y * B_COLS + x]) {
-				int color = board[y * B_COLS + x];
+				int c = board[y * B_COLS + x]; /* color */
 
-				shadow[y * B_COLS + x] = color;
-				draw(x * 2 + 28, y, color);
+				shadow[y * B_COLS + x] = c;
+				draw(x * 2 + 28, y, c);
 			}
 		}
 	}
@@ -173,20 +173,22 @@ static int update(void)
 	return getchar();
 }
 
-int fits_in(int *shape, int pos)
+/* Check if shape fits in the current position */
+static int fits_in(int *s, int pos)
 {
-	if (board[pos] || board[pos + shape[1]] || board[pos + shape[2]] || board[pos + shape[3]])
+	if (board[pos] || board[pos + s[1]] || board[pos + s[2]] || board[pos + s[3]])
 		return 0;
 
 	return 1;
 }
 
-static void place(int *shape, int pos, int color)
+/* place shape at pos with color */
+static void place(int *s, int pos, int c)
 {
-	board[pos] = color;
-	board[pos + shape[1]] = color;
-	board[pos + shape[2]] = color;
-	board[pos + shape[3]] = color;
+	board[pos] = c;
+	board[pos + s[1]] = c;
+	board[pos + s[2]] = c;
+	board[pos + s[3]] = c;
 }
 
 static int *next_shape(void)
