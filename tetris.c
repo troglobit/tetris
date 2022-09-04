@@ -315,7 +315,7 @@ static void exit_handler(int signo)
 	exit(0);
 }
 
-static int sig_init(void)
+static void sig_init(void)
 {
 	struct sigaction sa;
 
