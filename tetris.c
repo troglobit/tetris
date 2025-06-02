@@ -402,14 +402,8 @@ int main(void)
 		if (c == keys[KEY_PAUSE] || c == keys[KEY_QUIT]) {
 			freeze(1);
 
-			if (c == keys[KEY_QUIT]) {
-				clrscr();
-				gotoxy(0, 0);
-
-				printf("\033[0mYour score: %d points x level %d = %d\n\n", points, level, points * level);
-				show_high_score();
+			if (c == keys[KEY_QUIT])
 				break;
-			}
 
 			for (j = B_SIZE; j--; shadow[j] = 0)
 			   ;
@@ -427,6 +421,11 @@ int main(void)
 	}
 
 	clrscr();
+	gotoxy(0, 0);
+
+	printf("\033[0mYour score: %d points x level %d = %d\n\n", points, level, points * level);
+	show_high_score();
+
 	if (tty_exit() == -1)
 		return 1;
 
