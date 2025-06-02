@@ -362,11 +362,11 @@ int main(void)
 
 							for (; j % B_COLS; board[j--] = 0)
 							   ;
-							c = update();
+							update();
 
 							for (; --j; board[j + B_COLS] = board[j])
 							   ;
-							c = update();
+							update();
 						}
 					}
 				}
