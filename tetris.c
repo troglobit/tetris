@@ -20,6 +20,7 @@
  * page at IOCCC http://www.ioccc.org/1989/tromp.hint
  */
 
+#include <paths.h>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -65,9 +66,6 @@
 #define KEY_DROP   3
 #define KEY_PAUSE  4
 #define KEY_QUIT   5
-
-#define HIGH_SCORE_FILE "/var/games/tetris.scores"
-#define TEMP_SCORE_FILE "/tmp/tetris-tmp.scores"
 
 static volatile sig_atomic_t running = 1;
 
@@ -207,29 +205,83 @@ static int *next_shape(void)
 	return next;
 }
 
+/* Try /var/games first, fallback to $HOME or even /tmp if not available */
 static void show_high_score(void)
 {
 #ifdef ENABLE_HIGH_SCORE
-	FILE *tmpscore;
+	const char *score_name = "tetris.scores";
+	char score_file[256];
+	char buf[512];
+	FILE *fp;
 
-	if ((tmpscore = fopen(HIGH_SCORE_FILE, "a"))) {
-		char *name = getenv("LOGNAME");
+	snprintf(score_file, sizeof(score_file), "/var/games/%s", score_name);
+	fp = fopen(score_file, "a");
+	if (!fp) {
+		const char *home = getenv("HOME");
 
-		if (!name)
-			name = "anonymous";
-
-		fprintf(tmpscore, "%7d\t %5d\t  %3d\t%s\n", points * level, points, level, name);
-		fclose(tmpscore);
-
-		system("cat " HIGH_SCORE_FILE "| sort -rn | head -10 >" TEMP_SCORE_FILE
-		       "&& cp " TEMP_SCORE_FILE " " HIGH_SCORE_FILE);
-		remove(TEMP_SCORE_FILE);
+		if (home) {
+			snprintf(score_file, sizeof(score_file), "%s/.%s", home, score_name);
+			fp = fopen(score_file, "a");
+		}
 	}
 
-	if (!access(HIGH_SCORE_FILE, R_OK)) {
+	if (!fp) {
+		snprintf(score_file, sizeof(score_file), "%s%s", _PATH_TMP, score_name);
+		fp = fopen(score_file, "a");
+	}
+
+	if (fp) {
+		char temp_file[] = "/tmp/tetris-XXXXXX";
+		const char *name = getenv("LOGNAME");
+		int fd;
+
+		if (!name) {
+			name = getenv("USER");
+			if (!name)
+				name = "anonymous";
+		}
+
+		fprintf(fp, "%7d\t %5d\t  %3d\t%s\n", points * level, points, level, name);
+		fclose(fp);
+
+		fd = mkstemp(temp_file);
+		if (fd != -1) {
+			pid_t pid = fork();
+
+			if (pid == 0) {
+				dup2(fd, STDOUT_FILENO);
+				close(fd);
+
+				snprintf(buf, sizeof(buf), "cat %s |sort -rn |head -10", score_file);
+				system(buf);
+				exit(0);
+			} else if (pid > 0) {
+				int status;
+
+				close(fd);
+				waitpid(pid, &status, 0);
+
+				if (WIFEXITED(status) && WEXITSTATUS(status) == 0) {
+					snprintf(buf, sizeof(buf), "mv %s %s", temp_file, score_file);
+					system(buf);
+				}
+			} else {
+				close(fd);
+			}
+
+			remove(temp_file);
+		}
+	}
+
+	fp = fopen(score_file, "r");
+	if (fp) {
 //		puts("\nHit RETURN to see high scores, ^C to skip.");
 		fprintf(stderr, "  Score\tPoints\tLevel\tName\n");
-		system("cat " HIGH_SCORE_FILE);
+
+		while (fgets(buf, sizeof(buf), fp))
+			fputs(buf, stderr);
+
+		fclose(fp);
 	}
 #endif /* ENABLE_HIGH_SCORE */
 }
