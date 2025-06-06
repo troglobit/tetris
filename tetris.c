@@ -131,7 +131,7 @@ static int update(void)
 				int c = preview[y * B_COLS + x]; /* color */
 
 				shadow_preview[y * B_COLS + x] = c;
-				draw(x * 2 + 26 + 28, start + y, c);
+				draw(x * 2 + 26, start + y, c);
 			}
 		}
 	}
@@ -144,7 +144,7 @@ static int update(void)
 				int c = board[y * B_COLS + x]; /* color */
 
 				shadow[y * B_COLS + x] = c;
-				draw(x * 2 + 28, y, c);
+				draw(x * 2, y, c);
 			}
 		}
 	}
@@ -157,16 +157,16 @@ static int update(void)
 
 #ifdef ENABLE_SCORE
 	/* Display current level and points */
-	gotoxy(26 + 28, 2);
+	gotoxy(26, 2);
 	printf("\033[0mLevel  : %d", level);
-	gotoxy(26 + 28, 3);
+	gotoxy(26, 3);
 	printf("Points : %d", points);
 #endif
 #ifdef ENABLE_PREVIEW
-	gotoxy(26 + 28, 5);
+	gotoxy(26, 5);
 	printf("Preview:");
 #endif
-	gotoxy(26 + 28, 10);
+	gotoxy(26, 10);
 	printf("Keys:");
 	fflush(stdout);
 
@@ -290,17 +290,17 @@ static void show_online_help(void)
 {
 	const int start = 11;
 
-	gotoxy(26 + 28, start);
+	gotoxy(26, start);
 	puts("\033[0mj     - left");
-	gotoxy(26 + 28, start + 1);
+	gotoxy(26, start + 1);
 	puts("k     - rotate");
-	gotoxy(26 + 28, start + 2);
+	gotoxy(26, start + 2);
 	puts("l     - right");
-	gotoxy(26 + 28, start + 3);
+	gotoxy(26, start + 3);
 	puts("space - drop");
-	gotoxy(26 + 28, start + 4);
+	gotoxy(26, start + 4);
 	puts("p     - pause");
-	gotoxy(26 + 28, start + 5);
+	gotoxy(26, start + 5);
 	puts("q     - quit");
 }
 
