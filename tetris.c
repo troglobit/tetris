@@ -21,10 +21,12 @@
  */
 
 #include <paths.h>
+#include <poll.h>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/ioctl.h>
 #include <sys/time.h>
 #include <sys/wait.h>
 #include <termios.h>
@@ -45,9 +47,13 @@
 	sigaction(signo, &sa, NULL)
 
 /* the board */
-#define      B_COLS 12
-#define      B_ROWS 23
-#define      B_SIZE (B_ROWS * B_COLS)
+#define B_COLS 12
+#define B_ROWS 23
+#define B_SIZE (B_ROWS * B_COLS)
+
+/* min size */
+#define MIN_COLS 40
+#define MIN_ROWS 21
 
 #define TL     -B_COLS-1	/* top left */
 #define TC     -B_COLS		/* top center */
@@ -77,6 +83,9 @@ static int level = 1;
 static int points = 0;
 static int lines_cleared = 0;
 static int board[B_SIZE], shadow[B_SIZE];
+
+static int ttcols;		/* probed terminal width */
+static int ttrows;		/* probed terminal height */
 
 static int *peek_shape;		/* peek preview of next shape */
 static int  pcolor;
@@ -304,10 +313,53 @@ static void show_online_help(void)
 	puts("q     - quit");
 }
 
+
+static int tty_size(void)
+{
+	struct pollfd fd = { STDIN_FILENO, POLLIN, 0 };
+	struct winsize ws = { 0 };
+	const char *cols, *lins;
+
+	cols = getenv("COLUMNS");
+	lins = getenv("LINES");
+	if (cols && lins) {
+		ttcols = atoi(cols);
+		ttrows = atoi(lins);
+	}
+
+	if (!ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws)) {
+		ttcols = ws.ws_col;
+		ttrows = ws.ws_row;
+	} else {
+		fprintf(stderr, "\e7\e[r\e[999;999H\e[6n");
+
+		if (poll(&fd, 1, 300) > 0) {
+			int row, col;
+
+			if (scanf("\e[%d;%dR", &row, &col) == 2) {
+				ttcols = col;
+				ttrows = row;
+			}
+		}
+
+		fprintf(stderr, "\e8");
+	}
+
+	if (ttcols < MIN_COLS || ttrows < MIN_ROWS) {
+		fprintf(stderr, "Terminal too small (min: %dx%d)\n", MIN_COLS, MIN_ROWS);
+		return -1;
+	}
+
+	return 0;
+}
+
 /* Code stolen from http://c-faq.com/osdep/cbreak.html */
 static int tty_init(void)
 {
 	struct termios modmodes;
+
+	if (tty_size() < 0)
+		return -1;
 
 	if (tcgetattr(fileno(stdin), &savemodes) < 0)
 		return -1;
@@ -390,6 +442,8 @@ int main(void)
 		*ptr++ = i < 25 || i % B_COLS < 2 ? 60 : 0;
 
 	srand((unsigned int)time(NULL));
+
+	/* Probe screen size, save to global variables ttcols and ttrows */
 	if (tty_init() == -1)
 		return 1;
 
