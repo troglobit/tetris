@@ -34,7 +34,6 @@
 #include <unistd.h>
 
 #define clrscr()       puts ("\033[2J\033[1;1H")
-#define gotoxy(x,y)    printf("\033[%d;%dH", y, x)
 #define hidecursor()   puts ("\033[?25l")
 #define showcursor()   puts ("\033[?25h")
 #define bgcolor(c,s)   printf("\033[%dm" s, c ? c + 40 : 0)
@@ -113,6 +112,15 @@ static int shapes[] = {
 	 5, TC, BC, BL, 6,	/* _| */
 	 6, TC, BC,  2 * B_COLS, 7, /* | sticks out */
 };
+
+static void gotoxy(int x, int y)
+{
+	int xpos = (ttcols - MIN_COLS) / 2;
+	int ypos = (ttrows - MIN_ROWS) / 2;
+
+	printf("\033[%d;%dH", ypos + y, xpos + x);
+}
+
 
 static void draw(int x, int y, int c)
 {
