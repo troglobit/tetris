@@ -535,8 +535,6 @@ int main(void)
 	}
 
 	clrscr();
-	gotoxy(0, 0);
-
 	printf("\033[0mYour score: %d points x level %d = %d\n\n", points, level, points * level);
 	show_high_score();
 
