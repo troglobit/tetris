@@ -9,12 +9,12 @@ library dependencies other than a standard C library, like [uClibc][] or
 [musl libc][]. Hence, very suitable for embedded devices in need of an
 easter egg ;-)
 
-Issue tracker and GIT repository available at GitHub:
+Issue tracker, GIT repository, and releases available at GitHub:
 
   * [Repository][]
   * [Issue Tracker][]
+  * [Latest Release][]
   * [Docker Image](https://ghcr.io/troglobit/tetris)
-  * [tetris-1.4.0.tar.gz][tarball], [MD5][], [SHA256][]
 
 
 Docker Image
@@ -34,6 +34,7 @@ docker build -t troglobit:tetris .
 docker run -ti troglobit:tetris
 ```
 
+> [!IMPORTANT]
 > These instructions assume you already have [docker.io][] installed.
 
 
@@ -52,8 +53,6 @@ This human-readable "clone" is maintained by [Joachim Wiberg][].
 [docker.io]:       https://www.docker.com
 [John Tromp]:      https://tromp.github.io/
 [Repository]:      https://github.com/troglobit/tetris
+[Latest Release]:  https://github.com/troglobit/tetris/releases/latest
 [Issue Tracker]:   https://github.com/troglobit/tetris/issues
 [Joachim Wiberg]:  https://troglobit.com
-[tarball]:         https://ftp.troglobit.com/tetris/tetris-1.4.0.tar.gz
-[MD5]:             https://ftp.troglobit.com/tetris/tetris-1.4.0.tar.gz.md5
-[SHA256]:          https://ftp.troglobit.com/tetris/tetris-1.4.0.tar.gz.sha256
