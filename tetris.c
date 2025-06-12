@@ -473,10 +473,13 @@ int main(void)
 	while (running) {
 		if (resized) {
 			resized = 0;
-			if (tty_size() < 0) {
-				running = 0;
-				break;
-			}
+
+			/*
+			 * Ignore too small error at runtime, the game
+			 * will be garbled, forcing the user resize it
+			 * again to see, better than exiting mid game.
+			 */
+			tty_size();
 
 			/* Force full redraw by clearing shadow */
 			clrscr();
@@ -484,7 +487,7 @@ int main(void)
 			   ;
 			show_online_help();
 
-			/* Reset c to prevent unwanted tetromino drops */
+			/* Prevent unwanted drops or speedups */
 			c = 0;
 		}
 
