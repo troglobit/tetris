@@ -73,6 +73,7 @@
 #define KEY_QUIT   5
 
 static volatile sig_atomic_t running = 1;
+static volatile sig_atomic_t resized = 0;
 
 static struct termios savemodes;
 static int havemodes = 0;
@@ -426,6 +427,12 @@ static void exit_handler(int signo)
 	running = 0;
 }
 
+static void resize_handler(int signo)
+{
+	(void)signo;
+	resized = 1;
+}
+
 static void sig_init(void)
 {
 	struct sigaction sa;
@@ -433,6 +440,7 @@ static void sig_init(void)
 	SIGNAL(SIGINT, exit_handler);
 	SIGNAL(SIGTERM, exit_handler);
 	SIGNAL(SIGALRM, alarm_handler);
+	SIGNAL(SIGWINCH, resize_handler);
 
 	/* Start update timer. */
 	alarm_handler(0);
@@ -463,6 +471,23 @@ int main(void)
 
 	shape = next_shape();
 	while (running) {
+		if (resized) {
+			resized = 0;
+			if (tty_size() < 0) {
+				running = 0;
+				break;
+			}
+
+			/* Force full redraw by clearing shadow */
+			clrscr();
+			for (j = B_SIZE; j--; shadow[j] = 0)
+			   ;
+			show_online_help();
+
+			/* Reset c to prevent unwanted tetromino drops */
+			c = 0;
+		}
+
 		if (c < 0) {
 			if (fits_in(shape, pos + B_COLS)) {
 				pos += B_COLS;
