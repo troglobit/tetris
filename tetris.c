@@ -216,7 +216,7 @@ static int update(void)
 }
 
 /* Check if shape fits in the current position */
-static int fits_in(int *s, int pos)
+static int fits_in(const int *s, int pos)
 {
 	if (board[pos] || board[pos + s[1]] || board[pos + s[2]] || board[pos + s[3]])
 		return 0;
@@ -225,7 +225,7 @@ static int fits_in(int *s, int pos)
 }
 
 /* place shape at pos with color */
-static void place(int *s, int pos, int c)
+static void place(const int *s, int pos, int c)
 {
 	board[pos] = c;
 	board[pos + s[1]] = c;
