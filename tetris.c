@@ -51,7 +51,7 @@
 #define B_SIZE (B_ROWS * B_COLS)
 
 /* min size */
-#define MIN_COLS 40
+#define MIN_COLS 43
 #define MIN_ROWS 21
 
 #define TL     -B_COLS-1	/* top left */
@@ -131,7 +131,7 @@ static void draw(int x, int y, int c)
 
 static int update(void)
 {
-	int x, y;
+	int x, y, c;
 
 #ifdef ENABLE_PREVIEW
 	static int shadow_preview[B_COLS * 10] = { 0 };
@@ -146,7 +146,7 @@ static int update(void)
 	for (y = 0; y < 4; y++) {
 		for (x = 0; x < B_COLS; x++) {
 			if (preview[y * B_COLS + x] - shadow_preview[y * B_COLS + x]) {
-				int c = preview[y * B_COLS + x]; /* color */
+				c = preview[y * B_COLS + x]; /* color */
 
 				shadow_preview[y * B_COLS + x] = c;
 				draw(x * 2 + 26, start + y, c);
@@ -159,7 +159,7 @@ static int update(void)
 	for (y = 1; y < B_ROWS - 1; y++) {
 		for (x = 0; x < B_COLS; x++) {
 			if (board[y * B_COLS + x] - shadow[y * B_COLS + x]) {
-				int c = board[y * B_COLS + x]; /* color */
+				c = board[y * B_COLS + x]; /* color */
 
 				shadow[y * B_COLS + x] = c;
 				draw(x * 2, y, c);
@@ -188,7 +188,31 @@ static int update(void)
 	printf("Keys:");
 	fflush(stdout);
 
-	return getchar();
+	c = getchar();
+
+	/* Handle arrow key escape sequences */
+	if (c == 27) {
+		c = getchar();
+		if (c == '[') {
+			c = getchar();
+			switch (c) {
+			case 'A':
+				return keys[KEY_ROTATE];
+			case 'B':
+				return keys[KEY_DROP];
+			case 'C':
+				return keys[KEY_RIGHT];
+			case 'D':
+				return keys[KEY_LEFT];
+			default:
+				return c;
+			}
+		}
+
+		return 27;
+	}
+
+	return c;
 }
 
 /* Check if shape fits in the current position */
@@ -309,17 +333,17 @@ static void show_online_help(void)
 	const int start = 11;
 
 	gotoxy(26, start);
-	puts("\033[0mj     - left");
+	puts("\033[0mj     ← left");
 	gotoxy(26, start + 1);
-	puts("k     - rotate");
+	puts("k     ↑ rotate");
 	gotoxy(26, start + 2);
-	puts("l     - right");
+	puts("l     → right");
 	gotoxy(26, start + 3);
-	puts("space - drop");
+	puts("space ↓ drop");
 	gotoxy(26, start + 4);
-	puts("p     - pause");
+	puts("p       pause");
 	gotoxy(26, start + 5);
-	puts("q     - quit");
+	puts("q       quit");
 }
 
 
